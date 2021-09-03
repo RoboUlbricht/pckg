@@ -1,0 +1,39 @@
+object RurDBGridViewsDlg: TRurDBGridViewsDlg
+  Left = 0
+  Top = 0
+  BorderStyle = bsDialog
+  Caption = 'Poh'#318'ady'
+  ClientHeight = 309
+  ClientWidth = 645
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poOwnerFormCenter
+  ShowHint = True
+  PixelsPerInch = 96
+  TextHeight = 13
+  object btnOk: TButton
+    Left = 562
+    Top = 8
+    Width = 75
+    Height = 25
+    Caption = 'Ok'
+    Default = True
+    ModalResult = 1
+    TabOrder = 0
+  end
+  object btnCancel: TButton
+    Left = 562
+    Top = 39
+    Width = 75
+    Height = 25
+    Cancel = True
+    Caption = 'Zru'#353'i'#357
+    ModalResult = 2
+    TabOrder = 1
+  end
+end

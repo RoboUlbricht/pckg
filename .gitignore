@@ -1,0 +1,3 @@
+*.obj
+/win32/*
+/__history/*
