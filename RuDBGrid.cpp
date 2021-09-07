@@ -37,6 +37,35 @@ TRurDBGridConfigurator rdgc;
 int GRID_RK_DELAY = 0;
 String TRurDBGrid::view_path;
 
+TRurDBGridView::TRurDBGridView()
+{
+is_system = false;
+}
+
+TRurDBGridView::TRurDBGridView(const TRurDBGridView &m)
+{
+name = m.name;
+shortcut = m.shortcut;
+columns = m.columns;
+is_system = m.is_system;
+}
+
+void TRurDBGridView::operator=(const TRurDBGridView &m)
+{
+name = m.name;
+shortcut = m.shortcut;
+columns = m.columns;
+is_system = m.is_system;
+}
+
+void TRurDBGridView::SetColumnWidth(String fieldname, int width)
+{
+for(vColumns::iterator i = columns.begin(); i!=columns.end(); i++) {
+  if(i->fieldname==fieldname)
+    i->width = width;
+  }
+}
+
 ///
 /// \brief Konstruktor
 ///
@@ -71,6 +100,8 @@ hide_indicator=false;
 FOnExport=NULL;
 for(int i=0;i<4;i++)
   mih[i] = NULL;
+viewsItem = NULL;
+user_views_activity = 0;
 }
 
 ///
@@ -679,13 +710,13 @@ if(FKeyLocateRecord && DataSource && DataSource->DataSet && dynamic_cast<TFDData
 ///
 TPopupMenu* __fastcall TRurDBGrid::GetPopupMenu(void)
 {
-TPopupMenu *tmp=TDBGrid::GetPopupMenu();
-TMenuItem *mi, *viewsItem = NULL;
+TPopupMenu *tmp = TDBGrid::GetPopupMenu();
+TMenuItem *mi;
 if(!tmp)
   {
-  tmp=new TPopupMenu(this);
-  FVlastneMenu=tmp;
-  PopupMenu=tmp;
+  tmp = new TPopupMenu(this);
+  FVlastneMenu = tmp;
+  PopupMenu = tmp;
   }
 else
   {
@@ -718,35 +749,7 @@ if(FOnExport)
   mi->Tag=-5;
   tmp->Items->Add(mi);
   }
-if(def_views.size()) {
-  viewsItem = NewItem("Poh¾ady", 0, false, true, NULL, 0, "RGridItem2");
-  viewsItem->Hint = "Zoznam poh¾adov";
-  viewsItem->Tag = -2;
-  tmp->Items->Add(viewsItem);
-  int ii = 0;
-
-  for(vViews::iterator i=def_views.begin(); i!=def_views.end(); i++)
-    {
-    TMenuItem *mi2;
-    mi2 = NewItem(i->name, 0, false, true, MMenuExecute, 0, String("view_") + ii);
-    mi2->GroupIndex = 101;
-    mi2->RadioItem = true;
-    mi2->AutoCheck = true;
-    mi2->Checked = i->name==last_view;
-    mi2->Tag = -100 + ii;
-    //if(i->shortcut.Length())
-    //  mi2->ShortCut = TextToShortCut(i->shortcut);
-    viewsItem->Add(mi2);
-    ii++;
-    }
-
-  viewsItem->Add(NewLine());
-  mi=NewItem("Nastavenie...", 0, false, true, MMenuExecute, 0, "RGridItem11");
-  mi->Hint="Upravenie ståpcov v tabu¾ke";
-  mi->Tag=-11;
-  viewsItem->Add(mi);
-  }
-
+UpdateViewsMenu(tmp);
 if(configcolumns)
   {
   mi=NewItem("Ståpce...", 0, false, true, MMenuExecute, 0, "RGridItem2");
@@ -781,6 +784,65 @@ mih[1]->Visible=ExOptions.Contains(eoCheckBoxSelect);
 mih[2]->Visible=ExOptions.Contains(eoCheckBoxSelect);
 mih[3]->Visible=ExOptions.Contains(eoCheckBoxSelect) && FOnGroupCreate;
 return tmp;
+}
+
+///
+/// Aktualizovanie zoznamu pohladov
+///
+void TRurDBGrid::UpdateViewsMenu(TPopupMenu *tmp)
+{
+if(user_views.size()) {
+  if(viewsItem==NULL) {
+    viewsItem = NewItem("Poh¾ady", 0, false, true, NULL, 0, "RGridItem2");
+    viewsItem->Hint = "Zoznam poh¾adov";
+    viewsItem->Tag = -2;
+    tmp->Items->Add(viewsItem);
+    }
+  else {
+    viewsItem->Clear();
+    }
+
+  int ii = 0;
+  for(vViews::iterator i=user_views.begin(); i!=user_views.end(); i++) {
+    TMenuItem *mi2;
+    mi2 = NewItem(i->name, 0, false, true, MMenuExecute, 0, String("view_") + ii);
+    mi2->GroupIndex = 101;
+    mi2->RadioItem = true;
+    mi2->AutoCheck = true;
+    mi2->Checked = i->name==last_view;
+    mi2->Tag = -100 + ii;
+    //if(i->shortcut.Length())
+    //  mi2->ShortCut = TextToShortCut(i->shortcut);
+    viewsItem->Add(mi2);
+    ii++;
+    }
+
+  viewsItem->Add(NewLine());
+  TMenuItem *mi;
+  mi = NewItem("Nastavenie...", 0, false, true, MMenuExecute, 0, "RGridItem11");
+  mi->Hint = "Upravenie ståpcov v tabu¾ke";
+  mi->Tag = -11;
+  viewsItem->Add(mi);
+  }
+}
+
+///
+/// Najde aktivny pohlad
+///
+TRurDBGridView* TRurDBGrid::GetActiveView()
+{
+return GetView(last_view);
+}
+
+///
+/// Najde pohlad podla mena
+///
+TRurDBGridView* TRurDBGrid::GetView(String name)
+{
+for(vViews::iterator i=user_views.begin(); i!=user_views.end(); i++)
+  if(i->name==name)
+    return &*i;
+return NULL;
 }
 
 ///
@@ -839,18 +901,42 @@ switch(tag)
 ///
 void TRurDBGrid::LoadView(int id)
 {
-TRurDBGridView &v = def_views[id];
-last_view = v.name;
+TRurDBGridView &v = user_views[id];
+LoadView(&v);
+}
 
-Columns->Clear();
-for(vColumns::iterator i=v.columns.begin(); i!=v.columns.end(); i++) {
-  TColumn *c = Columns->Add();
-  c->Title->Caption = i->caption;
-  c->FieldName = i->fieldname;
-  c->Width = i->width;
-  c->Visible = true;
-  if(c->Visible && this->FOnColEnable)
-    c->Visible = this->FOnColEnable(this, c->Title->Caption, c->FieldName);
+///
+/// Prepnutie pohladu
+///
+void TRurDBGrid::LoadView(String name)
+{
+TRurDBGridView *v = GetView(name);
+if(v==NULL)
+  v = &*user_views.begin();
+LoadView(v);
+}
+
+///
+/// Prepnutie pohladu
+///
+void TRurDBGrid::LoadView(TRurDBGridView *v)
+{
+try {
+  user_views_activity++;
+  last_view = v->name;
+
+  Columns->Clear();
+  for(vColumns::iterator i=v->columns.begin(); i!=v->columns.end(); i++) {
+    TColumn *c = Columns->Add();
+    c->Title->Caption = i->caption;
+    c->FieldName = i->fieldname;
+    c->Width = i->width;
+    c->Visible = true;
+    if(c->Visible && this->FOnColEnable)
+      c->Visible = this->FOnColEnable(this, c->Title->Caption, c->FieldName);
+    }
+} __finally {
+  user_views_activity--;
   }
 }
 
@@ -905,6 +991,12 @@ void TRurDBGrid::SetupViews()
 rur::ptr<TRurDBGridViewsDlg> col(new TRurDBGridViewsDlg(this));
 col->grid = this;
 int vys = col->ShowModal();
+if(vys==mrOk) {
+  user_views = col->user_views;
+  last_view = user_views[col->lbZoznam->ItemIndex].name;
+  UpdateViewsMenu(NULL);
+  LoadView(col->lbZoznam->ItemIndex);
+  }
 if(vys==mrOk && FOnColumnsChanged)
   FOnColumnsChanged(this);
 }
@@ -914,6 +1006,8 @@ if(vys==mrOk && FOnColumnsChanged)
 ///
 void TRurDBGrid::PrisposobSirky(int zaciatok)
 {
+if(user_views.size()) // pohladove sa neprisposobuju
+  return;
 if(configcolumns && loadedcolumns) // stlpce su
   return;
 
@@ -1004,7 +1098,13 @@ if(Distance)
 ///
 void __fastcall TRurDBGrid::ColumnMoved(int FromIndex, int ToIndex)
 {
-TSMDBGrid::ColumnMoved(FromIndex,ToIndex);
+TSMDBGrid::ColumnMoved(FromIndex, ToIndex);
+if(user_views.size() && user_views_activity==0) {
+  TRurDBGridView *av = GetActiveView();
+  TRurDBGridColumn c = av->columns[FromIndex];
+  av->columns[FromIndex] = av->columns[ToIndex];
+  av->columns[ToIndex] = c;
+  }
 }
 
 ///
@@ -1013,6 +1113,14 @@ TSMDBGrid::ColumnMoved(FromIndex,ToIndex);
 void __fastcall TRurDBGrid::ColWidthsChanged(void)
 {
 TSMDBGrid::ColWidthsChanged();
+if(user_views.size() && user_views_activity==0) {
+  TRurDBGridView *av = GetActiveView();
+  int poc = Columns->Count;
+  for(int i=0; i<poc; i++) {
+    TColumn *col = Columns->operator [](i);
+    av->SetColumnWidth(col->FieldName, col->Width);
+    }
+  }
 }
 
 ///
@@ -1047,6 +1155,8 @@ void TRurDBGrid::XMLInitName(AnsiString name)
 if(TDirectory::Exists(view_path)) {
   String view = view_path + AnsiReplaceText(name, "::", ".") + ".json";
   if(TFile::Exists(view)) {
+    json_name = name;
+    //json_name = "test"; // iba ked testujes
     TBytes bt = TFile::ReadAllBytes(view);
     rur::json::RObject jn;
     jn.Parse(bt);
@@ -1084,13 +1194,47 @@ if(TDirectory::Exists(view_path)) {
     user_views = def_views;
 
     // uzivatelske udaje
-    String user = rdgc.LoadData("test");
+    String user = rdgc.LoadData(json_name);
     if(user.Length() && user[1]==L'{') { // je to JSON
       rur::json::RObject j1((TJSONObject*)TJSONObject::ParseJSONValue(user));
       String lv = j1.value("last_view");
+      last_view = lv; // zapnem posledny pohlad
+      rur::json::RArray views(j1.array("views"), false);
+      for(unsigned i=0; i<views->Count; i++) {
+        rur::json::RObject item(views.item(i), false);
+        String name = item.value("name");
+        TRurDBGridView *old = GetView(name);
+        if(old && old->is_system) { // iba aktualizujem
+          rur::json::RArray columns(item.array("columns"), false);
+          for(unsigned j=0; j<columns->Count; j++) {
+            rur::json::RObject item(columns.item(j), false);
+            String fieldname = item.value("fieldname");
+            int width = item.tvalue<int>("width");
+            old->SetColumnWidth(fieldname, width);
+          }
+        }
+        else { // pridam ho
+          TRurDBGridView v;
+          v.is_system = false;
+          v.name = name;
+          rur::json::RArray columns(item.array("columns"), false);
+          for(unsigned j=0; j<columns->Count; j++) {
+            rur::json::RObject item(columns.item(j), false);
+            TRurDBGridColumn c;
+            c.fieldname = item.value("fieldname");
+            for(vColumns::iterator k=def_columns.begin(); k!=def_columns.end(); k++) {
+              if(k->fieldname == c.fieldname)
+                c.caption = k->caption;
+              }
+            c.width = item.tvalue<int>("width");
+            v.columns.push_back(c);
+            }
+          user_views.push_back(v);
+        }
+      }
     }
 
-    LoadView(0);
+    LoadView(last_view);
     return;
     }
   }
@@ -1111,8 +1255,23 @@ if(user_views.size()) {
   rur::json::RObject jn(new TJSONObject());
   jn.set("last_view", last_view);
   jn.set("version", 1);
+  rur::json::RArray jviews(new TJSONArray(), false);
+  for(vViews::iterator i=user_views.begin(); i!=user_views.end(); i++) {
+    rur::json::RObject v(new TJSONObject(), false);
+    v.set("name", i->name);
+    rur::json::RArray jcolumns(new TJSONArray(), false);
+    for(vColumns::iterator j=i->columns.begin(); j!=i->columns.end(); j++) {
+      rur::json::RObject c(new TJSONObject(), false);
+      c.set("fieldname", j->fieldname);
+      c.set("width", j->width);
+      jcolumns->AddElement(c.get());
+      }
+    v->AddPair("columns", jcolumns.get());
+    jviews->AddElement(v.get());
+    }
+  jn->AddPair("views", jviews.get());
   String json = jn->ToJSON();
-  rdgc.SaveData("test", json);
+  rdgc.SaveData(json_name, json);
 }
 if(xmlname.Length())
   rdgc.SaveGrid(this,xmlname);

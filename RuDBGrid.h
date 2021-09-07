@@ -43,6 +43,12 @@ String name;      ///< Nazov pohladu
 String shortcut;  ///< Klavesova skratka
 vColumns columns; ///< Zosnam stlpcov
 bool is_system;   ///< Je to systemovy pohlad
+
+TRurDBGridView();
+TRurDBGridView(const TRurDBGridView &m);
+void operator=(const TRurDBGridView &m);
+
+void SetColumnWidth(String fieldname, int width);
 };
 
 typedef std::vector<TRurDBGridView> vViews;
@@ -86,11 +92,16 @@ private:
         TDateTime  ds_time; ///< cas, kedy to ma vypuknut
         TTimer    *ds_timer;///< timer ktory to sleduje
         int roll_koliesko;  ///< pouzite na znizovanie citlivosti kolieska
+
         static String view_path;   ///< Cesta do adresara, kde su ulozne pohlady
         vColumns def_columns; ///< Zoznam stlpcov z pohladu
         vViews def_views;     ///< Zoznam pohladov
-        vViews user_views;     ///< Zoznam uzivatelskych pohladov (aj implicitne tam su)
+        vViews user_views;    ///< Zoznam uzivatelskych pohladov (aj implicitne tam su)
         String last_view;     ///< Posledny pohlad
+        TMenuItem *viewsItem; ///< Korenova polozka pohladov
+        int user_views_activity; ///< Prave ja cosi robim so stlpcami
+        String json_name;     ///< Pod akym menom sa uklada
+
         AnsiString xmlname; ///< Meno na ukladanie kofiguracie
         bool configcolumns; ///< Ci moze konfigurovat stlpce
         bool loadedcolumns; ///< Ci boli stlpce nastavene vlastnymi prostriedkami
@@ -110,8 +121,13 @@ private:
   AnsiString TranslateText(AnsiString s);
   void InvertSelectAllClick();
   void CreateGroupClick();
+  void LoadView(TRurDBGridView *v);
   void LoadView(int id);
+  void LoadView(String name);
   void SetupViews();
+  void UpdateViewsMenu(TPopupMenu *tmp);
+  TRurDBGridView* GetActiveView();
+  TRurDBGridView* GetView(String name);
 
 protected:
   DYNAMIC void __fastcall TitleClick(TColumn* Column);
