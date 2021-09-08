@@ -19,6 +19,8 @@
 #include <strutils.hpp>
 #include <System.IOUtils.hpp>
 #include "JsonTemplates.h"
+#include <xmldoc.hpp>
+#include "xmltemplates.h"
 
 #pragma package(smart_init)
 //---------------------------------------------------------------------------
@@ -845,6 +847,23 @@ for(vViews::iterator i=user_views.begin(); i!=user_views.end(); i++)
 return NULL;
 }
 
+void __fastcall TRurDBGrid::SetExtendedColumns(String ex)
+{
+FExtendedColumns = ex;
+ext_columns.clear();
+_di_IXMLDocument xml = NewXMLDocument();
+xml->LoadFromXML(String(UTF8Encode(WideString(FExtendedColumns))));
+rur::XMLNode root = xml->DocumentElement;
+for(int k=0; k<root.Items.Count; k++) {
+  rur::XMLNode row = root.Items[k];
+  TRurDBGridColumn c;
+  c.caption = row["caption"];
+  c.fieldname = row["fieldname"];
+  c.width = row["width"];
+  ext_columns.push_back(c);
+  }
+}
+
 ///
 /// Pripoji svoju reakciu na menu polozku
 ///
@@ -1223,6 +1242,10 @@ if(TDirectory::Exists(view_path)) {
             TRurDBGridColumn c;
             c.fieldname = item.value("fieldname");
             for(vColumns::iterator k=def_columns.begin(); k!=def_columns.end(); k++) {
+              if(k->fieldname == c.fieldname)
+                c.caption = k->caption;
+              }
+            for(vColumns::iterator k=ext_columns.begin(); k!=ext_columns.end(); k++) {
               if(k->fieldname == c.fieldname)
                 c.caption = k->caption;
               }

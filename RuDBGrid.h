@@ -95,6 +95,7 @@ private:
 
         static String view_path;   ///< Cesta do adresara, kde su ulozne pohlady
         vColumns def_columns; ///< Zoznam stlpcov z pohladu
+        vColumns ext_columns; ///< Zoznam stlpcov z pohladu (z rozsirenych vlastnosti)
         vViews def_views;     ///< Zoznam pohladov
         vViews user_views;    ///< Zoznam uzivatelskych pohladov (aj implicitne tam su)
         String last_view;     ///< Posledny pohlad
@@ -109,7 +110,7 @@ private:
         int namescount;     ///< Pocet pomenovanych stlpcov
         bool hide_indicator;///< Ma skryt dgIndicator po vypnuti multiselektu
         TNotifyEvent FOnExport;
-        AnsiString FExtendedColumns;
+        String FExtendedColumns;
         String dead_key;
 
         void __fastcall SetRIniName(AnsiString value);
@@ -128,6 +129,7 @@ private:
   void UpdateViewsMenu(TPopupMenu *tmp);
   TRurDBGridView* GetActiveView();
   TRurDBGridView* GetView(String name);
+  void __fastcall SetExtendedColumns(String ex);
 
 protected:
   DYNAMIC void __fastcall TitleClick(TColumn* Column);
@@ -192,7 +194,7 @@ __published:
   __property TRurDBGridColEnabled OnColEnabled  = { read=FOnColEnable, write=FOnColEnable };
   __property TRurDBGridGroupEvent OnGroupCreate  = { read=FOnGroupCreate, write=FOnGroupCreate };
   __property TNotifyEvent OnExport  = { read=FOnExport, write=FOnExport };
-  __property AnsiString ExtendedColumns = {read=FExtendedColumns, write=FExtendedColumns};
+  __property String ExtendedColumns = {read=FExtendedColumns, write=SetExtendedColumns};
 };
 //---------------------------------------------------------------------------
 #endif
