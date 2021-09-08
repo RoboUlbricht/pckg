@@ -10,8 +10,6 @@
 #pragma hdrstop
 
 #include "RuDBGridViews.h"
-#include <xmldoc.hpp>
-#include "xmltemplates.h"
 
 #pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -42,20 +40,10 @@ for(vViews::iterator i = user_views.begin(); i!=user_views.end(); i++) {
 for(vColumns::iterator i = grid->def_columns.begin(); i!=grid->def_columns.end(); i++) {
   lbStlpce->Items->Add(i->caption);
 }
-
-if(grid->ExtendedColumns.Length()) {
-  _di_IXMLDocument xml = NewXMLDocument();
-  xml->LoadFromXML(String(UTF8Encode(WideString(grid->ExtendedColumns))));
-  rur::XMLNode root = xml->DocumentElement;
-  for(int k=0; k<root.Items.Count; k++) {
-    rur::XMLNode row = root.Items[k];
-    TRurDBGridColumn c;
-    c.caption = row["caption"];
-    c.fieldname = row["fieldname"];
-    c.width = row["width"];
-    ucolumns.push_back(c);
-    lbUser->Items->Add(c.caption);
-  }
+// Zoznam uzivatelskych
+ucolumns = grid->ext_columns;
+for(vColumns::iterator i = ucolumns.begin(); i!=ucolumns.end(); i++) {
+  lbUser->Items->Add(i->caption);
 }
 
 if(lbZoznam->ItemIndex==-1)
