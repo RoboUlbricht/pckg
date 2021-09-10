@@ -6,7 +6,11 @@
 #include <SysUtils.hpp>
 #include <Classes.hpp>
 #include <DB.hpp>
+#if defined(RUR_DB_USE_ADO)
+
+#else
 #include <FireDAC.Comp.Client.hpp>
+#endif
 
 #include "rurarray.h"
 

@@ -170,7 +170,7 @@ public:
         TColumn* FindNamedColumn(AnsiString name);
         AnsiString FindColumnName(TColumn *col);
 	void ReagujNaMenu(TMenuItem *menu);
-  void DisableAutosave() {xmlname="";}
+  void DisableAutosave();
   String GetColOrder(TColumn *col, String def = EmptyStr);
 
   friend class TRurDBGridConfigurator;

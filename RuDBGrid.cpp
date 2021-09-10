@@ -4,11 +4,14 @@
 #pragma hdrstop
 
 #include "RuDBGrid.h"
-#include "RurTable.h"
+//#include "RurTable.h"
 #include <inifiles.hpp>
 #include <clipbrd.hpp>
 #if defined(RUR_DB_USE_ADO)
   #include <adodb.hpp>
+  #define RUR_DB_DATASET Data::Win::Adodb::TADODataSet
+#else
+  #define RUR_DB_DATASET Firedac::Comp::Dataset::TFDDataSet
 #endif
 #include "RuDBGridLocate.h"
 #include "RuDBGridColumns.h"
@@ -690,7 +693,7 @@ if(Key=='\x1b') {TDBGrid::KeyPress(Key);return;}
 if(!DataSource) return;
 if(!DataSource->DataSet) return;
 if(!DataSource->DataSet->Active) return;
-if(FKeyLocateRecord && DataSource && DataSource->DataSet && dynamic_cast<TFDDataSet*>(DataSource->DataSet))
+if(FKeyLocateRecord && DataSource && DataSource->DataSet && dynamic_cast<RUR_DB_DATASET*>(DataSource->DataSet))
   {
   if(FOnBeforeKeyLocate) FOnBeforeKeyLocate(this);
   TLocateDlg *ld=new TLocateDlg(this);
@@ -851,16 +854,21 @@ void __fastcall TRurDBGrid::SetExtendedColumns(String ex)
 {
 FExtendedColumns = ex;
 ext_columns.clear();
-_di_IXMLDocument xml = NewXMLDocument();
-xml->LoadFromXML(String(UTF8Encode(WideString(FExtendedColumns))));
-rur::XMLNode root = xml->DocumentElement;
-for(int k=0; k<root.Items.Count; k++) {
-  rur::XMLNode row = root.Items[k];
-  TRurDBGridColumn c;
-  c.caption = row["caption"];
-  c.fieldname = row["fieldname"];
-  c.width = row["width"];
-  ext_columns.push_back(c);
+if(ex.Length()==0)
+  return;
+try {
+  _di_IXMLDocument xml = NewXMLDocument();
+  xml->LoadFromXML(String(UTF8Encode(WideString(FExtendedColumns))));
+  rur::XMLNode root = xml->DocumentElement;
+  for(int k=0; k<root.Items.Count; k++) {
+    rur::XMLNode row = root.Items[k];
+    TRurDBGridColumn c;
+    c.caption = row["caption"];
+    c.fieldname = row["fieldname"];
+    c.width = row["width"];
+    ext_columns.push_back(c);
+    }
+} catch (...) {
   }
 }
 
@@ -913,6 +921,11 @@ switch(tag)
     LoadView(100 + tag);
     break;
   }
+}
+
+void TRurDBGrid::DisableAutosave()
+{
+xmlname = "";
 }
 
 ///
