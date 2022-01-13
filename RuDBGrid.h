@@ -18,6 +18,7 @@ class TRurDBGrid;
 typedef void __fastcall (__closure *TRurDBGridWWWEvent)(AnsiString path);
 typedef bool __fastcall (__closure *TRurDBGridColEnabled)(TObject *Sender, AnsiString colname, AnsiString fieldname);
 typedef void __fastcall (__closure *TRurDBGridGroupEvent)(TObject *Sender);
+typedef void __fastcall (__closure *TRurDBGridSetupColumnsEvent)(TObject *Sender);
 typedef void __fastcall (__closure *TRurDBGridTitleClickSort)(TColumn *col);
 extern AnsiString (*TranslateGrid)(AnsiString s);
 extern int GRID_RK_DELAY;
@@ -88,6 +89,7 @@ private:
         TDBGridClickEvent  FOnCellClick2;
         TRurDBGridColEnabled FOnColEnable;
         TRurDBGridGroupEvent FOnGroupCreate;
+        TRurDBGridSetupColumnsEvent FOnSetupColumns;
         TButton *tmpb;
         TDateTime  ds_time; ///< cas, kedy to ma vypuknut
         TTimer    *ds_timer;///< timer ktory to sleduje
@@ -179,6 +181,7 @@ public:
 
 __published:
   __property AnsiString RIniName  = { read=GetRIniName, write=SetRIniName };
+  __property AnsiString XMLName = { read=xmlname };
   __property bool TitleSort  = { read=FTitleSort, write=FTitleSort };
   __property bool KeyLocateRecord  = { read=FKeyLocateRecord, write=FKeyLocateRecord};
   __property TNotifyEvent OnBeforeKeyLocate  = { read=FOnBeforeKeyLocate, write=FOnBeforeKeyLocate };
@@ -193,6 +196,7 @@ __published:
   __property TDBGridClickEvent OnCellClick2 = {read=FOnCellClick2, write=FOnCellClick2};
   __property TRurDBGridColEnabled OnColEnabled  = { read=FOnColEnable, write=FOnColEnable };
   __property TRurDBGridGroupEvent OnGroupCreate  = { read=FOnGroupCreate, write=FOnGroupCreate };
+  __property TRurDBGridSetupColumnsEvent OnSetupColumns  = { read=FOnSetupColumns, write=FOnSetupColumns };
   __property TNotifyEvent OnExport  = { read=FOnExport, write=FOnExport };
   __property String ExtendedColumns = {read=FExtendedColumns, write=SetExtendedColumns};
 };

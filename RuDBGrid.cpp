@@ -93,6 +93,7 @@ FOnCellCheckClick=NULL;
 FOnCellClick2=NULL;
 FOnColEnable=NULL;
 FOnGroupCreate = NULL;
+FOnSetupColumns = NULL;
 trt=0; // nemam table
 cfg=0; // nemam konfiguraciu
 ds_timer=NULL;
@@ -1008,6 +1009,10 @@ if(FOnGroupCreate) {
 ///
 void TRurDBGrid::SetupColumns()
 {
+if(FOnSetupColumns) {
+  FOnSetupColumns(this);
+  return;
+}
 rur::ptr<TRurDBGridColumnsDlg> col(new TRurDBGridColumnsDlg(this));
 col->grid = this;
 int vys = col->ShowModal();
