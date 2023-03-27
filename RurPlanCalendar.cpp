@@ -1043,7 +1043,7 @@ void TRurPlanCalendar::DrawGrid(int x,int ww,TDateTime d, int vect)
         {
         v_date[vect].push_back(&r1);
         }
-      else if(from_int==d_int && r1.from==r1.to) // bez hodiny v dni
+      else if(from_int==d_int && r1.from==r1.to && r1.from==DateOf(r1.from)) // bez hodiny v dni
         {
         v_date[vect].push_back(&r1);
         }
