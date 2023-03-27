@@ -129,7 +129,7 @@ private:
 
   bool drag,needrecalc;
   int dragy;
-  int dragmode; // co bude robit dragovacka
+  int dragmode; // co bude robit dragovacka (1 cely termin, 2 horny okraj, 3 dolny okraj)
   int draggeditem;
   TRect dragrect;
   AnsiString FMeniny;
@@ -169,6 +169,7 @@ private:
   MESSAGE void __fastcall CMHintShow(Messages::TMessage &Message);
   void UpdateRange();
   int TimeToCol(TDateTime t);
+  TDateTime ColToTime(int c);
 
 protected:
   virtual void __fastcall CreateParams(TCreateParams &Params);

@@ -1352,25 +1352,64 @@ FPDobaZaciatok=TimeToCol(FPDobaTZaciatok);
 FPDobaKoniec=TimeToCol(FPDobaTKoniec);
 }
 
+///
+/// Prevod datum na stlpec
+///
 int TRurPlanCalendar::TimeToCol(TDateTime t)
 {
-unsigned short hour,min,ss,sss;
-t.DecodeTime(&hour,&min,&ss,&sss);
-int _f=0;
+unsigned short hour, min, ss, sss;
+t.DecodeTime(&hour, &min, &ss, &sss);
+int _f = 0;
 switch(FScale)
   {
   case pcps60:
-    _f=hour;
+    _f = hour;
     break;
   case pcps30:
   case pcps15:
   case pcps10:
   case pcps6:
   case pcps5:
-    _f=hour*FBunkaMultiply+min/FBunkaMinuty;
+    _f = hour * FBunkaMultiply + min / FBunkaMinuty;
     break;
   }
 return _f;
+}
+
+///
+/// Prevod stlpca na cas
+///
+TDateTime TRurPlanCalendar::ColToTime(int c)
+{
+short hour, mn;
+switch(FScale)
+  {
+  case pcps60:
+    hour = c;
+    mn = 0;
+    break;
+  case pcps30:
+    hour = c / FBunkaMultiply;
+    mn = (c % FBunkaMultiply) * FBunkaMinuty;
+    break;
+  case pcps15:
+    hour = c / FBunkaMultiply;
+    mn = (c % FBunkaMultiply) * FBunkaMinuty;
+    break;
+  case pcps10:
+    hour = c / FBunkaMultiply;
+    mn = (c % FBunkaMultiply) * FBunkaMinuty;
+    break;
+  case pcps6:
+    hour = c / FBunkaMultiply;
+    mn = (c % FBunkaMultiply) * FBunkaMinuty;
+    break;
+  case pcps5:
+    hour = c / FBunkaMultiply;
+    mn = (c % FBunkaMultiply) * FBunkaMinuty;
+    break;
+  }
+return TDateTime(hour, mn, 0, 0);
 }
 
 TPopupMenu* __fastcall TRurPlanCalendar::GetPopupMenu(void)
@@ -1770,7 +1809,7 @@ return false;
 ///
 /// Pustenie lavej mysky mysky
 ///
-void TRurPlanCalendar::LMouseUp(int X,int Y)
+void TRurPlanCalendar::LMouseUp(int X, int Y)
 {
 if(!drag) return;
 int sel;
@@ -1780,36 +1819,36 @@ switch(FTyp)
     if(dragmode>0)
       {
       DrawDraggedItem();
-      rca.select=draggeditem;
-      int a=dragrect.Top/20;
-      int b=dragrect.Bottom/20;
-      if(a<0) {b+=-a;a=0;}
-      if(b>47) {a-=b-47;b=47;}
-      TDateTime t1=FDatum_od+TDateTime(a/2,a%2*30,0,0);
-      TDateTime t2=FDatum_do+TDateTime(b/2,b%2*30,0,0);
+      rca.select = draggeditem;
+      int a = dragrect.Top / 20;
+      int b = dragrect.Bottom / 20;
+      if(a<0) {b += -a; a = 0;}
+      if(b>FBunkaCount) {a -= b-FBunkaCount; b = FBunkaCount;}
+      TDateTime t1 = FDatum_od + ColToTime(a);
+      TDateTime t2 = FDatum_do + ColToTime(b);
       if(rca.si && FOnSelTerm2)
-        FOnSelTerm2(this,rca.si);
+        FOnSelTerm2(this, rca.si);
       if(FOnMoveTerm) // poviem, ze selektol termin
-        FOnMoveTerm(this,&rca[draggeditem],t1,t2);
+        FOnMoveTerm(this, &rca[draggeditem], t1, t2);
       return;
       }
-    SelBunka2=Y/20+1;
+    SelBunka2 = Y/20 + 1;
     if(SelBunka>SelBunka2) // normalizujem selekciu
-      std::swap(SelBunka,SelBunka2);
+      std::swap(SelBunka, SelBunka2);
     if(SelBunka+1==SelBunka2) // sanca ze selektnem termin
       {
-      int sel=rca.FindXY(X,Y);
+      int sel = rca.FindXY(X,Y);
       if(sel!=-1)
         {
-        ShowHint=true;
-        Hint=rca[rca.select].text;
+        ShowHint = true;
+        Hint = rca[rca.select].text;
         if(SelBunka!=-1) // odmazem staru selekciu
           {DrawSelection();SelBunka=-1;}
-        DrawItem(Canvas,rca.si);
+        DrawItem(Canvas, rca.si);
         if(FOnSelTerm) // poviem, ze selektol termin
           FOnSelTerm(this);
         if(rca.si && FOnSelTerm2)
-          FOnSelTerm2(this,rca.si);
+          FOnSelTerm2(this, rca.si);
         }
       }
     break;
