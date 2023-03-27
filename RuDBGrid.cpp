@@ -93,6 +93,7 @@ FOnCellCheckClick=NULL;
 FOnCellClick2=NULL;
 FOnColEnable=NULL;
 FOnGroupCreate = NULL;
+FOnGroupEdit = NULL;
 FOnSetupColumns = NULL;
 trt=0; // nemam table
 cfg=0; // nemam konfiguraciu
@@ -728,10 +729,11 @@ else
   {
   if(tmp->FindItem(FCommand,fkCommand))
     {
-    mih[0]->Visible=ExOptions.Contains(eoCheckBoxSelect);
-    mih[1]->Visible=ExOptions.Contains(eoCheckBoxSelect);
-    mih[2]->Visible=ExOptions.Contains(eoCheckBoxSelect);
-    mih[3]->Visible=ExOptions.Contains(eoCheckBoxSelect) && FOnGroupCreate;
+    mih[0]->Visible = ExOptions.Contains(eoCheckBoxSelect);
+    mih[1]->Visible = ExOptions.Contains(eoCheckBoxSelect);
+    mih[2]->Visible = ExOptions.Contains(eoCheckBoxSelect);
+    mih[3]->Visible = ExOptions.Contains(eoCheckBoxSelect) && FOnGroupCreate;
+    mih[4]->Visible = ExOptions.Contains(eoCheckBoxSelect) && FOnGroupEdit;
     return tmp;
     }
   mi=NewLine();
@@ -781,14 +783,20 @@ mih[2]->Tag=-6;
 tmp->Items->Add(mih[2]);
 
 mih[3]=NewItem("Vytvori skupinu...", 0, false, true, MMenuExecute, 0, "RGridItem6");
-mih[3]->Hint="Výtvorí sa skupina položiek a nastaví sa vo filtri";
+mih[3]->Hint="Vytvorí sa skupina položiek a nastaví sa vo filtri";
 mih[3]->Tag=-7;
 tmp->Items->Add(mih[3]);
 
-mih[0]->Visible=ExOptions.Contains(eoCheckBoxSelect);
-mih[1]->Visible=ExOptions.Contains(eoCheckBoxSelect);
-mih[2]->Visible=ExOptions.Contains(eoCheckBoxSelect);
-mih[3]->Visible=ExOptions.Contains(eoCheckBoxSelect) && FOnGroupCreate;
+mih[4]=NewItem("Spravova skupinu...", 0, false, true, MMenuExecute, 0, "RGridItem7");
+mih[4]->Hint="Upravovanie existujúcej skupiny";
+mih[4]->Tag=-8;
+tmp->Items->Add(mih[4]);
+
+mih[0]->Visible = ExOptions.Contains(eoCheckBoxSelect);
+mih[1]->Visible = ExOptions.Contains(eoCheckBoxSelect);
+mih[2]->Visible = ExOptions.Contains(eoCheckBoxSelect);
+mih[3]->Visible = ExOptions.Contains(eoCheckBoxSelect) && FOnGroupCreate;
+mih[4]->Visible = ExOptions.Contains(eoCheckBoxSelect) && FOnGroupEdit;
 return tmp;
 }
 
@@ -902,6 +910,8 @@ switch(tag)
     break;
   case -7:CreateGroupClick();
     break;
+  case -8:EditGroupClick();
+    break;
   case -10:CopyCell2Clipboard();
     break;
   case -11:
@@ -1001,6 +1011,16 @@ void TRurDBGrid::CreateGroupClick()
 {
 if(FOnGroupCreate) {
   FOnGroupCreate(this);
+  }
+}
+
+///
+/// Editovanie skupiny
+///
+void TRurDBGrid::EditGroupClick()
+{
+if(FOnGroupEdit) {
+  FOnGroupEdit(this);
   }
 }
 

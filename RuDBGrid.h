@@ -78,7 +78,7 @@ private:
         int FSort;
         Word FCommand;
         TPopupMenu *FVlastneMenu;
-        TMenuItem *mih[4];
+        TMenuItem *mih[5];
         TNotifyEvent FOnBeforeKeyLocate,FOnAfterKeyLocate;
         TNotifyEvent FOnDelayedScroll;
         TNotifyEvent FOnColumnsChanged;
@@ -89,6 +89,7 @@ private:
         TDBGridClickEvent  FOnCellClick2;
         TRurDBGridColEnabled FOnColEnable;
         TRurDBGridGroupEvent FOnGroupCreate;
+        TRurDBGridGroupEvent FOnGroupEdit;
         TRurDBGridSetupColumnsEvent FOnSetupColumns;
         TButton *tmpb;
         TDateTime  ds_time; ///< cas, kedy to ma vypuknut
@@ -124,6 +125,7 @@ private:
   AnsiString TranslateText(AnsiString s);
   void InvertSelectAllClick();
   void CreateGroupClick();
+  void EditGroupClick();
   void LoadView(TRurDBGridView *v);
   void LoadView(int id);
   void LoadView(String name);
@@ -196,6 +198,7 @@ __published:
   __property TDBGridClickEvent OnCellClick2 = {read=FOnCellClick2, write=FOnCellClick2};
   __property TRurDBGridColEnabled OnColEnabled  = { read=FOnColEnable, write=FOnColEnable };
   __property TRurDBGridGroupEvent OnGroupCreate  = { read=FOnGroupCreate, write=FOnGroupCreate };
+  __property TRurDBGridGroupEvent OnGroupEdit  = { read=FOnGroupEdit, write=FOnGroupEdit };
   __property TRurDBGridSetupColumnsEvent OnSetupColumns  = { read=FOnSetupColumns, write=FOnSetupColumns };
   __property TNotifyEvent OnExport  = { read=FOnExport, write=FOnExport };
   __property String ExtendedColumns = {read=FExtendedColumns, write=SetExtendedColumns};
