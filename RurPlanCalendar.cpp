@@ -1710,7 +1710,7 @@ void TRurPlanCalendar::DrawDraggedItem()
 /// Stlacenie lavej mysky
 /// Rozlisujeme medzi kliknutim na nejaku polozku a kliknutim na nejaky den.
 ///
-void TRurPlanCalendar::LMouseDown(int X,int Y)
+void TRurPlanCalendar::LMouseDown(int X, int Y)
 {
 switch(FTyp)
   {
@@ -1719,40 +1719,37 @@ switch(FTyp)
       return;
     if(SelBunka!=-1)
       DrawSelection();
-    if(rca.select!=-1)
-      {
-      RurCalendarItem *r1=rca.si;
-      rca.select=-1;
-      rca.si=NULL;
-      DrawItem(Canvas,r1);
+    if(rca.select!=-1) {
+      RurCalendarItem *r1 = rca.si;
+      rca.select = -1;
+      rca.si = NULL;
+      DrawItem(Canvas, r1);
       }
-    rca.select=-1;
-    rca.si=NULL;
-    SelBunka=Y/20;SelBunka2=SelBunka+1;
+    rca.select = -1;
+    rca.si = NULL;
+    SelBunka = Y/20; SelBunka2 = SelBunka+1;
     DrawSelection();
     break;
   case pcplan5:
-    if(rca.select!=-1)
-      {
-      RurCalendarItem *r1=rca.si;
-      rca.select=-1;
-      rca.si=NULL;
-      DrawItem(Canvas,r1);
+    if(rca.select!=-1) {
+      RurCalendarItem *r1 = rca.si;
+      rca.select = -1;
+      rca.si = NULL;
+      DrawItem(Canvas, r1);
       }
-    if(FindDayXY(X,Y)) // klikol niekde do dna
-      {
-      FDatum=days_selected->d;
+    if(FindDayXY(X, Y)) { // klikol niekde do stlpca, ktory predstavuje den
+      FDatum = days_selected->d;
       Paint();
       }
     break;
   case pcplan7:
   case pcplan31:
-    if(FindDayXY(X,Y)) // klikol niekde do dna
+    if(FindDayXY(X, Y)) // klikol niekde do stlpca, ktory predstavuje den
       {
-      FDatum=days_selected->d;
-      if(FindDayItemXY(X,Y))
+      FDatum = days_selected->d;
+      if(FindDayItemXY(X, Y))
         {
-        rca.si=days_selecteditem->ri;
+        rca.si = days_selecteditem->ri;
         }
       Paint();
       }
@@ -1760,15 +1757,15 @@ switch(FTyp)
   case pcplanU:
     if(rca.select!=-1)
       {
-      RurCalendarItem *r1=rca.si;
-      rca.select=-1;
-      rca.si=NULL;
-      DrawItem(Canvas,r1);
+      RurCalendarItem *r1 = rca.si;
+      rca.select = -1;
+      rca.si = NULL;
+      DrawItem(Canvas, r1);
       }
     break;
   }
 if(rca.si && FOnSelTerm2)
-  FOnSelTerm2(this,rca.si);
+  FOnSelTerm2(this, rca.si);
 }
 
 ///
