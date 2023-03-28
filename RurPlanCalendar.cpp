@@ -44,6 +44,7 @@ namespace Rurplancalendar
 
 struct RRect : public TRect
   {
+  RRect() {left=0; top=0; right=0; bottom=0;}
   RRect(TRect r) {left=r.left;top=r.top;right=r.right;bottom=r.Bottom;}
   RRect(int a,int b,int c,int d) {left=a;top=b;right=c;bottom=d;}
   void Okraj(int a,int b) {left-=a;right+=a;top-=b;bottom+=b;}
@@ -345,21 +346,13 @@ switch(FTyp)
     break;
   case pcplan5:
     {
-    WW=(Width-8-40-16)/5;SelSirka=WW;
-    DrawGrid(40,WW,FDatum_od,0);
-    days[0].r=Rect(40,0,40+WW,24*2*20);
-    DrawGrid(40+WW+2,WW,FDatum_od+1,1);
-    days[1].r=Rect(40+WW+2,0,40+WW+2+WW,24*2*20);
-    DrawGrid(40+WW*2+4,WW,FDatum_od+2,2);
-    days[2].r=Rect(40+WW*2+4,0,40+WW*2+4+WW,24*2*20);
-    DrawGrid(40+WW*3+6,WW,FDatum_od+3,3);
-    days[3].r=Rect(40+WW*3+6,0,40+WW*3+6+WW,24*2*20);
-    DrawGrid(40+WW*4+8,WW,FDatum_od+4,4);
-    days[4].r=Rect(40+WW*4+8,0,40+WW*4+8+WW,24*2*20);
+    WW = (Width-8-40-16)/5; SelSirka = WW;
+    for(int i=0; i<5; i++) {
+      days[i].d = FDatum_od + i;
+      DrawGrid(40+WW*i+2*i, WW, days[i].d, i);
+      days[i].r = Rect(40+WW*i+2*i, 0, 40+WW*i+2*i+WW, 24*2*20);
+      }
     DrawPruzok();
-    TDateTime d=FDatum_od;
-    for(int i=0;i<5;i++)
-      days[i].d=d++;
     }
     break;
   };
@@ -1678,8 +1671,19 @@ void TRurPlanCalendar::EndDC()
 
 void TRurPlanCalendar::DrawSelection()
   {
-  RRect r8(40,SelBunka*20,40+SelSirka,SelBunka2*20);
-  ::InvertRect(Canvas->Handle,&r8);
+  RRect r8;
+  switch(FTyp) {
+    case pcplan1:
+      r8 = RRect(40, SelBunka*20, 40+SelSirka, SelBunka2*20);
+      ::InvertRect(Canvas->Handle, &r8);
+      break;
+    case pcplan5:
+      if(days_selected) {
+        r8 = RRect(days_selected->r.Left, SelBunka*20, days_selected->r.Left+SelSirka, SelBunka2*20);
+        ::InvertRect(Canvas->Handle, &r8);
+      }
+      break;
+    }
   }
 
 // invertnem selektovany termin
@@ -1712,6 +1716,8 @@ void TRurPlanCalendar::DrawDraggedItem()
 ///
 void TRurPlanCalendar::LMouseDown(int X, int Y)
 {
+SelOriginX = X;
+SelOriginY = Y;
 switch(FTyp)
   {
   case pcplan1:
@@ -1738,8 +1744,12 @@ switch(FTyp)
       DrawItem(Canvas, r1);
       }
     if(FindDayXY(X, Y)) { // klikol niekde do stlpca, ktory predstavuje den
-      FDatum = days_selected->d;
-      Paint();
+      if(FDatum != days_selected->d) {
+        FDatum = days_selected->d;
+        Paint();
+        }
+      SelBunka = Y/20; SelBunka2 = SelBunka+1;
+      DrawSelection();
       }
     break;
   case pcplan7:

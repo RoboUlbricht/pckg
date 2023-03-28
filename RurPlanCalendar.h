@@ -113,7 +113,8 @@ private:
   TPlanMoveTerm FOnMoveTerm;
 
   //TDate SelDatum,SelDatum2;
-  int   SelBunka,SelBunka2;
+  int SelOriginX, SelOriginY; ///< Presny pociatok kliknutia
+  int   SelBunka, SelBunka2;
   int   SelSirka;
   bool hidedate;
   bool hidemeniny;
