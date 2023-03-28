@@ -1580,27 +1580,24 @@ void __fastcall TRurPlanCalendar::MouseMove(Classes::TShiftState Shift, int X, i
     switch(FTyp)
       {
       case pcplan1:
-        int sel=rca.FindXY2(X,Y);
-        if(sel!=-1) // sme nad nejakym terminom
-          {
-          draggeditem=sel;
-          int okraj=rca.FindXYPos(sel,X,Y);
-          if(okraj==0)
-            {
-            Cursor=crDefault;
-            dragmode=1; // budeme tahat termin
+      case pcplan5:
+        int sel = rca.FindXY2(X, Y);
+        if(sel!=-1) { // sme nad nejakym terminom
+          draggeditem = sel;
+          int okraj = rca.FindXYPos(sel, X, Y);
+          if(okraj==0) {
+            Cursor = crDrag;
+            dragmode = 1; // budeme tahat termin
             }
-          else
-            {
-            Cursor=crSizeNS;
-            if(okraj==-1) dragmode=2; // horny okraj
-            else          dragmode=3; // dolny okraj
+          else {
+            Cursor = crSizeNS;
+            if(okraj==-1) dragmode = 2; // horny okraj
+            else          dragmode = 3; // dolny okraj
             }
           }
-        else
-          {
-          Cursor=crDefault;
-          dragmode=0; // zase selekcie
+        else {
+          Cursor = crDefault;
+          dragmode = 0; // zase selekcie
           }
         break;
       }
@@ -1669,6 +1666,9 @@ void TRurPlanCalendar::EndDC()
   Canvas->Handle=0;
   }
 
+///
+/// Kreslenie selekcie
+///
 void TRurPlanCalendar::DrawSelection()
   {
   RRect r8;
