@@ -1609,44 +1609,77 @@ void __fastcall TRurPlanCalendar::MouseMove(Classes::TShiftState Shift, int X, i
     drag=false;
     return;
     }
+
+  // tahame alebo selektujeme
   if(dragmode==1 /*&& Top<Y */&& Y<10)
     {
-    drag=false;
+    drag = false;
     BeginDrag(true);
     return;
     }
-  StartDC(X,Y);
+  StartDC(X, Y);
   switch(FTyp)
     {
     case pcplan1:
-      if(dragmode>0)
-        {
+      if(dragmode>0) { // dragujeme termin
         DrawDraggedItem();
-        switch(dragmode)
-          {
+        int dify = Y - dragy;
+        switch(dragmode) {
           case 1:
-            dragrect.Top=rca[draggeditem].r.Top+Y-dragy;
-            dragrect.Bottom=rca[draggeditem].r.Bottom+Y-dragy;
+            dragrect.Top = rca[draggeditem].r.Top + dify;
+            dragrect.Bottom = rca[draggeditem].r.Bottom + dify;
             break;
           case 2:
-            dragrect.Top=rca[draggeditem].r.Top+Y-dragy;
+            dragrect.Top = rca[draggeditem].r.Top + dify;
             break;
           case 3:
-            dragrect.Bottom=rca[draggeditem].r.Bottom+Y-dragy;
+            dragrect.Bottom = rca[draggeditem].r.Bottom + dify;
             break;
           }
-        dragrect.Top=dragrect.Top/20*20;
-        dragrect.Bottom=dragrect.Bottom/20*20;
+        // zaokruhlenie na bunky
+        dragrect.Top = dragrect.Top/20*20;
+        dragrect.Bottom = dragrect.Bottom/20*20;
         DrawDraggedItem();
         EndDC();
         return;
         }
-      if(SelBunka!=-1)
-        {
-        int tmp=Y/20+1;
-        RRect r8(40,SelBunka2*20,40+SelSirka,tmp*20);
-        ::InvertRect(Canvas->Handle,&r8);
-        SelBunka2=tmp;
+
+      if(SelBunka!=-1) { // selektujeme bunky
+        int tmp = Y/20+1;
+        RRect r8(40, SelBunka2*20, 40+SelSirka, tmp*20);
+        ::InvertRect(Canvas->Handle, &r8);
+        SelBunka2 = tmp;
+        }
+      break;
+    case pcplan5:
+      if(dragmode>0) { // dragujeme termin
+        DrawDraggedItem();
+        int dify = Y - dragy;
+        switch(dragmode) {
+          case 1:
+            dragrect.Top = rca[draggeditem].r.Top + dify;
+            dragrect.Bottom = rca[draggeditem].r.Bottom + dify;
+            break;
+          case 2:
+            dragrect.Top = rca[draggeditem].r.Top + dify;
+            break;
+          case 3:
+            dragrect.Bottom = rca[draggeditem].r.Bottom + dify;
+            break;
+          }
+        // zaokruhlenie na bunky
+        dragrect.Top = dragrect.Top/20*20;
+        dragrect.Bottom = dragrect.Bottom/20*20;
+        DrawDraggedItem();
+        EndDC();
+        return;
+      }
+
+      if(SelBunka!=-1) { // selektujeme bunky
+        int tmp = Y/20+1;
+        RRect r8(days_selected->r.Left, SelBunka2*20, days_selected->r.Left+SelSirka, tmp*20);
+        ::InvertRect(Canvas->Handle, &r8);
+        SelBunka2 = tmp;
         }
       break;
     }
@@ -1746,8 +1779,8 @@ switch(FTyp)
     if(FindDayXY(X, Y)) { // klikol niekde do stlpca, ktory predstavuje den
       if(FDatum != days_selected->d) {
         FDatum = days_selected->d;
-        Paint();
         }
+      Paint();
       SelBunka = Y/20; SelBunka2 = SelBunka+1;
       DrawSelection();
       }
@@ -1783,12 +1816,12 @@ if(rca.si && FOnSelTerm2)
 ///
 bool TRurPlanCalendar::FindDayXY(int X,int Y)
 {
-for(int i=0;i<FTypDays;i++)
+for(int i=0; i<FTypDays; i++)
   {
-  if(PtInRect(&(days[i].r),TPoint(X,Y)))
+  if(PtInRect(&(days[i].r), TPoint(X,Y)))
     {
-    days_position=i;
-    days_selected=days+i;
+    days_position = i;
+    days_selected = days + i;
     return true;
     }
   }
@@ -1823,8 +1856,7 @@ int sel;
 switch(FTyp)
   {
   case pcplan1:
-    if(dragmode>0)
-      {
+    if(dragmode>0) {
       DrawDraggedItem();
       rca.select = draggeditem;
       int a = dragrect.Top / 20;
@@ -1860,6 +1892,21 @@ switch(FTyp)
       }
     break;
   case pcplan5:
+    if(dragmode>0) {
+      DrawDraggedItem();
+      rca.select = draggeditem;
+      int a = dragrect.Top / 20;
+      int b = dragrect.Bottom / 20;
+      if(a<0) {b += -a; a = 0;}
+      if(b>FBunkaCount) {a -= b-FBunkaCount; b = FBunkaCount;}
+      TDateTime t1 = days_selected->d + ColToTime(a);
+      TDateTime t2 = days_selected->d + ColToTime(b);
+      if(rca.si && FOnSelTerm2)
+        FOnSelTerm2(this, rca.si);
+      if(FOnMoveTerm) // poviem, ze selektol termin
+        FOnMoveTerm(this, &rca[draggeditem], t1, t2);
+      return;
+      }
   case pcplanU:
     sel=rca.FindXY(X,Y);
     if(sel!=-1)
