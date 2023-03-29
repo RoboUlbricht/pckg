@@ -79,6 +79,7 @@ class TRurPlanCalendarUsers : public v_users
   int selected;
 
   void SetSelected(int id);
+  TRurPlanCalendarUser* GetSelectedUser();
 
 public:
   TRurPlanCalendarUsers(TRurPlanCalendar *_parent) : parent(_parent) {
@@ -88,6 +89,7 @@ public:
   bool DeleteUser(int id);
 
   __property int Selected = {read = selected, write = SetSelected};
+  __property TRurPlanCalendarUser* SelectedUser = {read = GetSelectedUser};
 };
 
 ///

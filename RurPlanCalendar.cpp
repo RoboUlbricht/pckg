@@ -253,6 +253,19 @@ for(v_users::iterator i=begin(); i!=end(); i++) {
 selected = 0;
 }
 
+///
+/// Ziskanie oznaceneho uzivatela
+///
+TRurPlanCalendarUser* TRurPlanCalendarUsers::GetSelectedUser()
+{
+for(v_users::iterator i=begin(); i!=end(); i++) {
+  if(selected==i->id) {
+    return &*i;;
+    }
+  }
+return NULL;
+}
+
 /////////////////////////////////////////////////////
 // TRurPlanCalendar
 /////////////////////////////////////////////////////
@@ -604,6 +617,7 @@ if(poc==0) return;
 int xx=40;
 int sirka=ClientWidth-xx;
 int s1=sirka/poc;
+SelSirka = s1;
 int por=0;
 int diff=ClientWidth-xx-s1*poc+1;
 for(v_users::iterator i=users->begin();i!=users->end();i++)
@@ -1761,6 +1775,13 @@ void TRurPlanCalendar::DrawSelection()
         ::InvertRect(Canvas->Handle, &r8);
       }
       break;
+    case pcplanU:
+      if(users->Selected) {
+        TRurPlanCalendarUser *u = users->SelectedUser;
+        r8 = RRect(u->r.Left, SelBunka*20, u->r.Left+SelSirka, SelBunka2*20);
+        ::InvertRect(Canvas->Handle, &r8);
+      }
+      break;
     }
   }
 
@@ -1854,6 +1875,10 @@ switch(FTyp)
     users->Selected = uid;
     if(uid && FOnUserSelect)
       FOnUserSelect(this, uid);
+    if(uid) {
+      SelBunka = Y/20; SelBunka2 = SelBunka+1;
+      DrawSelection();
+      }
     }
     break;
   }
