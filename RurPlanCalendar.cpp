@@ -1631,6 +1631,7 @@ void __fastcall TRurPlanCalendar::MouseMove(Classes::TShiftState Shift, int X, i
       {
       case pcplan1:
       case pcplan5:
+      case pcplanU:
         int sel = rca.FindXY2(X, Y);
         if(sel!=-1) { // sme nad nejakym terminom
           draggeditem = sel;
