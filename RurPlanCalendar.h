@@ -20,8 +20,9 @@
 enum TPlanCalendarTyp {pcplan1, pcplan5, pcplan7, pcplan31, pcplanU};
 enum TPlanCalendarScale {pcps60, pcps30, pcps15, pcps10, pcps6, pcps5};
 
-typedef void __fastcall (__closure *TPlanEditEvent)(System::TObject* Sender,RurCalendarItem *ri);
-typedef void __fastcall (__closure *TPlanMoveTerm)(System::TObject* Sender,RurCalendarItem *ri,TDateTime t1,TDateTime t2);
+typedef void __fastcall (__closure *TPlanEditEvent)(System::TObject* Sender, RurCalendarItem *ri);
+typedef void __fastcall (__closure *TPlanMoveTerm)(System::TObject* Sender, RurCalendarItem *ri, TDateTime t1, TDateTime t2);
+typedef void __fastcall (__closure *TPlanUserSelectEvent)(System::TObject* Sender, int uid);
 
 class PACKAGE TRurPlanCalendarHeader;
 class PACKAGE TRurPlanCalendar;
@@ -111,6 +112,7 @@ private:
   TPlanEditEvent FOnEditTerm;
   TPlanEditEvent FOnSelTerm2;    ///< Event po selektnuti polozky
   TPlanMoveTerm FOnMoveTerm;
+  TPlanUserSelectEvent FOnUserSelect;
 
   //TDate SelDatum,SelDatum2;
   int SelOriginX, SelOriginY; ///< Presny pociatok kliknutia
@@ -166,8 +168,9 @@ private:
   int __fastcall GetPDobaKoniec();
   void __fastcall SetMeniny(AnsiString value);
   bool NeedPBH();
-  bool FindDayXY(int X,int Y);
-  bool FindDayItemXY(int X,int Y);
+  bool FindDayXY(int X, int Y);
+  bool FindDayItemXY(int X, int Y);
+  int FindUserXY(int X, int Y);
   MESSAGE void __fastcall CMHintShow(Messages::TMessage &Message);
   void UpdateRange();
   int TimeToCol(TDateTime t);
@@ -249,6 +252,7 @@ __published:
   __property TNotifyEvent OnDblClick = {read=FOnDblClick, write=FOnDblClick};
   __property TPlanEditEvent OnEditTerm = {read=FOnEditTerm, write=FOnEditTerm};
   __property TPlanMoveTerm OnMoveTerm = {read=FOnMoveTerm, write=FOnMoveTerm};
+  __property TPlanUserSelectEvent OnUserSelect = {read=FOnUserSelect, write=FOnUserSelect};
   __property TabStop;
   __property TabOrder;
   __property Hint;

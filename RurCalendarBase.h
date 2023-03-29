@@ -8,6 +8,7 @@ struct RurCalendarItem
   {
   long hash; // id polozky
   long typ;  // rozlisenie o aku kalendarovy typ sa jedna
+  long uid;  // ID uzivatela
   TRect r;
   TColor color;
   TDateTime from;
@@ -17,7 +18,12 @@ struct RurCalendarItem
   bool splnene; // splneny termin
   AnsiString text;
 
-  RurCalendarItem() {hash=typ=0;r.left=0;r.top=0;r.right=0;r.bottom=0;}
+  RurCalendarItem() {
+    hash=typ=0;
+    uid = 0;
+    r.left=0; r.top=0; r.right=0; r.bottom=0;
+    splnene = false;
+    }
   AnsiString Debug() {return text+" {"+r.left+","+r.top+","+r.right+","+r.bottom+"} <"+from.DateTimeString()+" "+to.DateTimeString()+">";}
   };
 

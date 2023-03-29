@@ -283,6 +283,7 @@ days_selected=NULL;
 days_selecteditem=NULL;
 FOnSelTerm2=NULL;
 users =new TRurPlanCalendarUsers(this);
+FOnUserSelect = NULL;
 }
 
 ///
@@ -600,11 +601,12 @@ for(v_users::iterator i=users->begin();i!=users->end();i++)
   por++;
   }
 (*users)[poc-1].r.Right+=diff;
+
 // rozhodenie poloziek medzi jednotlive stlpce s uzivatelmi
-for(int i=0;i<rca.GetItemsInContainer();i++)
+for(int i=0; i<rca.GetItemsInContainer(); i++)
   {
-  RurCalendarItem &r1=rca[i];
-  int id=r1.typ;
+  RurCalendarItem &r1 = rca[i];
+  int id = r1.uid;
   for(v_users::iterator i=users->begin();i!=users->end();i++)
     {
     if(i->id==id)
@@ -1822,7 +1824,7 @@ switch(FTyp)
       Paint();
       }
     break;
-  case pcplanU:
+  case pcplanU: {
     if(rca.select!=-1)
       {
       RurCalendarItem *r1 = rca.si;
@@ -1830,6 +1832,10 @@ switch(FTyp)
       rca.si = NULL;
       DrawItem(Canvas, r1);
       }
+    int uid = FindUserXY(X, Y);
+    if(uid && FOnUserSelect)
+      FOnUserSelect(this, uid);
+    }
     break;
   }
 if(rca.si && FOnSelTerm2)
@@ -1869,6 +1875,18 @@ for(v_items::iterator i=days_selected->items.begin();i!=days_selected->items.end
   }
 days_selecteditem=NULL;
 return false;
+}
+
+///
+/// Najde uzivatela po kliku do kalendara
+///
+int TRurPlanCalendar::FindUserXY(int X, int Y)
+{
+for(v_users::iterator i=users->begin(); i!=users->end(); i++) {
+  if(PtInRect(i->r, TPoint(X, Y)))
+    return i->id;
+  }
+return 0;
 }
 
 ///
