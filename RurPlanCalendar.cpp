@@ -208,17 +208,17 @@ return a.meno<b.meno;
 ///
 TRurPlanCalendarUser* TRurPlanCalendarUsers::AddUser(int id, AnsiString meno)
 {
-push_back(TRurPlanCalendarUser(id,meno));
-std::sort(this->begin(),this->end(),IsCalendarUserLess);
+push_back(TRurPlanCalendarUser(id, meno));
+selected = id;
+std::sort(this->begin(), this->end(), IsCalendarUserLess);
 parent->NeedRecalc();
 parent->Invalidate();
-for(v_users::iterator i=begin();i!=end();i++)
+for(v_users::iterator i=begin(); i!=end(); i++)
   {
   if(id==i->id)
     return &(*i);
-  }  
+  }
 return NULL;
-//return &(*this)[size()-1];
 }
 
 ///
@@ -237,6 +237,20 @@ for(v_users::iterator i=begin();i!=end();i++)
     }
   }
 return false;
+}
+
+///
+/// Oznacenie uzivatela
+///
+void TRurPlanCalendarUsers::SetSelected(int id)
+{
+for(v_users::iterator i=begin(); i!=end(); i++) {
+  if(id==i->id) {
+    selected = id;
+    return;
+    }
+  }
+selected = 0;
 }
 
 /////////////////////////////////////////////////////
@@ -798,6 +812,10 @@ for(v_users::iterator i=users->begin();i!=users->end();i++)
   Canvas->FillRect(r8);
   Canvas->FillRect(r24);
   r8.Left+=2;r24.Left+=2;
+  if(i->id==users->Selected)
+    Canvas->Font->Style = TFontStyles()<<fsBold;
+  else
+    Canvas->Font->Style = TFontStyles();
   ::DrawTextA(Canvas->Handle,i->meno.c_str(),-1,&r8,DT_LEFT|DT_TOP|DT_SINGLELINE);
   ::DrawTextA(Canvas->Handle,i->meno.c_str(),-1,&r8,DT_RIGHT|DT_BOTTOM|DT_SINGLELINE);
   ::DrawTextA(Canvas->Handle,i->meno.c_str(),-1,&r24,DT_LEFT|DT_TOP|DT_SINGLELINE);
@@ -1833,6 +1851,7 @@ switch(FTyp)
       DrawItem(Canvas, r1);
       }
     int uid = FindUserXY(X, Y);
+    users->Selected = uid;
     if(uid && FOnUserSelect)
       FOnUserSelect(this, uid);
     }

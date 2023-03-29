@@ -76,11 +76,18 @@ typedef std::vector<TRurPlanCalendarUser> v_users;
 class TRurPlanCalendarUsers : public v_users
 {
   TRurPlanCalendar *parent;
+  int selected;
+
+  void SetSelected(int id);
 
 public:
-  TRurPlanCalendarUsers(TRurPlanCalendar *_parent) : parent(_parent) {}
+  TRurPlanCalendarUsers(TRurPlanCalendar *_parent) : parent(_parent) {
+    selected = 0;
+  }
   TRurPlanCalendarUser* AddUser(int id, AnsiString meno);
   bool DeleteUser(int id);
+
+  __property int Selected = {read = selected, write = SetSelected};
 };
 
 ///
