@@ -2004,22 +2004,27 @@ bool TRurPlanCalendar::GetSel(TDateTime &from, TDateTime &to)
 switch(FTyp)
   {
   case pcplan1:
-    if(SelBunka==-1)
-      {
+    if(SelBunka==-1) {
       from=FDatum_od+TDateTime(8,0,0,0);
       to=FDatum_do+TDateTime(8,30,0,0);
       return false;
       }
-    else
-      {
+    else {
       from=FDatum_od+TDateTime(SelBunka/FBunkaMultiply,SelBunka%FBunkaMultiply*FBunkaMinuty,0,0);
       to=FDatum_do+TDateTime(SelBunka2/FBunkaMultiply,SelBunka2%FBunkaMultiply*FBunkaMinuty,0,0);
       return true;
       }
   case pcplan5:
-    from=FDatum+TDateTime(8,0,0,0);
-    to=FDatum+TDateTime(8,30,0,0);
-    return false;
+    if(SelBunka==-1) {
+      from = FDatum + TDateTime(8,0,0,0);
+      to = FDatum + TDateTime(8,30,0,0);
+      return false;
+      }
+    else {
+      from = FDatum + ColToTime(SelBunka);
+      to = FDatum + ColToTime(SelBunka2);
+      return true;
+      }
   case pcplan7:
     from=FDatum+TDateTime(8,0,0,0);
     to=FDatum+TDateTime(8,30,0,0);
