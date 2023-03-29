@@ -1892,8 +1892,11 @@ switch(FTyp)
       TDateTime t2 = FDatum_do + ColToTime(b);
       if(rca.si && FOnSelTerm2)
         FOnSelTerm2(this, rca.si);
-      if(FOnMoveTerm) // poviem, ze selektol termin
-        FOnMoveTerm(this, &rca[draggeditem], t1, t2);
+      if(FOnMoveTerm) { // poviem, ze selektol termin
+        RurCalendarItem *ri = &rca[draggeditem];
+        if(!(ri->from==t1 && ri->to==t2))
+          FOnMoveTerm(this, ri, t1, t2);
+        }
       return;
       }
     SelBunka2 = Y/20 + 1;
@@ -1928,8 +1931,11 @@ switch(FTyp)
       TDateTime t2 = days_selected->d + ColToTime(b);
       if(rca.si && FOnSelTerm2)
         FOnSelTerm2(this, rca.si);
-      if(FOnMoveTerm) // poviem, ze selektol termin
-        FOnMoveTerm(this, &rca[draggeditem], t1, t2);
+      if(FOnMoveTerm) { // poviem, ze selektol termin
+        RurCalendarItem *ri = &rca[draggeditem];
+        if(!(ri->from==t1 && ri->to==t2))
+          FOnMoveTerm(this, ri, t1, t2);
+        }
       return;
       }
   case pcplanU:
