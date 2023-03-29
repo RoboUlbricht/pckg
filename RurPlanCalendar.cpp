@@ -15,6 +15,9 @@
 #include <stdio.h>
 #include <dateutils.hpp>
 
+#define DEBUG(s)
+//#define DEBUG(s) DebugString(s);
+
 void Paint3dRamik(TCanvas *CC,TRect r1,AnsiString as);
 
 //---------------------------------------------------------------------------
@@ -244,7 +247,7 @@ return false;
 /// Konstruktor
 ///
 __fastcall TRurPlanCalendar::TRurPlanCalendar(TComponent* Owner)
-        : TScrollingWinControl(Owner)
+        : TScrollingWinControl(Owner), dc_count(0)
 {
 hidedate=false;
 hidemeniny=false;
@@ -303,6 +306,11 @@ TScrollingWinControl::CreateParams(Params);
 Params.ExStyle |= WS_EX_CLIENTEDGE;
 }
 
+void TRurPlanCalendar::DebugString(String s)
+{
+OutputDebugString(s.c_str());
+}
+
 ///
 /// Vykreslenie hlavicky
 ///
@@ -325,7 +333,7 @@ Canvas->Font->Color=clBlack;
 // ak treba prepocitat, resetnem predpocitane vektory
 if(needrecalc)
   {
-  OutputDebugStringA("Reset vectors");
+  DEBUG(L"Reset vectors");
   for(int i=0;i<31;i++) v_time[i].clear();
   for(int i=0;i<5;i++) v_date[i].clear();
   PaintRecalculate();
@@ -610,7 +618,7 @@ for(v_users::iterator j=users->begin();j!=users->end();j++)
   TDateTime d=FDatum;
   TDateTime d_end=EndOfTheDay(d);
   int d_int=d;
-  OutputDebugStringA("Need recalc grid");
+  DEBUG("Need recalc grid");
   for(std::vector<RurCalendarItem*>::iterator i=j->items.begin();i!=j->items.end();i++)
     {
     RurCalendarItem &r1=*(*i);
@@ -641,7 +649,7 @@ for(v_users::iterator j=users->begin();j!=users->end();j++)
         rrc.SetSirky(_f,_t,kde,j->r.Left+5,j->r.Right-j->r.Left-10);
         }
       j->time.push_back(&r1);
-      OutputDebugStringA(r1.Debug().c_str());
+      DEBUG(r1.Debug());
       }
     }
 
@@ -887,7 +895,7 @@ for(v_users::iterator j=users->begin();j!=users->end();j++)
 for(std::vector<RurCalendarItem*>::iterator i=j->time.begin();i!=j->time.end();i++)
   {
   RurCalendarItem *r1=(*i);
-  OutputDebugStringA(r1->Debug().c_str());
+  DEBUG(r1->Debug());
   DrawItem(Canvas,r1);
   }
 }
@@ -1023,7 +1031,7 @@ void TRurPlanCalendar::DrawGrid(int x,int ww,TDateTime d, int vect)
     {
     RPRecalcator rrc;
     int poc=rca.GetItemsInContainer();
-    OutputDebugStringA("Need recalc grid");
+    DEBUG("Need recalc grid");
     for(int i=0;i<poc;i++)
       {
       RurCalendarItem &r1=rca[i];
@@ -1054,16 +1062,16 @@ void TRurPlanCalendar::DrawGrid(int x,int ww,TDateTime d, int vect)
           rrc.SetSirky(_f,_t,kde,x+5,ww-10);
           }
         v.push_back(&r1);
-        OutputDebugStringA(r1.Debug().c_str());
+        DEBUG(r1.Debug());
         }
       }
     }
   // vykreslenie jednotlivych terminov
-  OutputDebugStringA("Draw");
+  DEBUG("Draw");
   for(std::vector<RurCalendarItem*>::iterator i=v.begin();i!=v.end();i++)
     {
     RurCalendarItem *r1=(*i);
-    OutputDebugStringA(r1->Debug().c_str());
+    DEBUG(r1->Debug());
     DrawItem(Canvas,r1);
     }
   Canvas->Font->Style=TFontStyles();
@@ -1486,7 +1494,7 @@ return FDatum;
 void TRurPlanCalendar::AddItem(RurCalendarItem &ri)
 {
 rca.Add(ri);
-OutputDebugStringA(("ADD: "+ri.Debug()).c_str());
+DEBUG("ADD: "+ri.Debug());
 needrecalc=true;
 }
 
@@ -1519,15 +1527,22 @@ needrecalc=true;
 ///
 void __fastcall TRurPlanCalendar::MouseUp(Controls::TMouseButton Button, Classes::TShiftState Shift, int X, int Y)
 {
-StartDC(X,Y);
-switch(Button)
-  {
-  case mbLeft:LMouseUp(X,Y);break;
-  case mbRight:RMouseUp(X,Y);break;
+DEBUG(__FUNC__)
+try {
+try {
+  StartDC(X, Y);
+  switch(Button)
+    {
+    case mbLeft: LMouseUp(X, Y);break;
+    case mbRight: RMouseUp(X, Y);break;
+    }
+  EndDC();
+  TScrollingWinControl::MouseUp(Button, Shift, X, Y);
+} catch (...) {
   }
-EndDC();
-drag=false;
-TScrollingWinControl::MouseUp(Button,Shift,X,Y);
+} __finally {
+  drag = false;
+  }
 }
 
 ///
@@ -1535,6 +1550,7 @@ TScrollingWinControl::MouseUp(Button,Shift,X,Y);
 ///
 void __fastcall TRurPlanCalendar::MouseDown(Controls::TMouseButton Button, Classes::TShiftState Shift, int X, int Y)
 {
+DEBUG(__FUNC__)
 SetFocus();
 StartDC(X,Y);
 switch(Button)
@@ -1686,17 +1702,26 @@ void __fastcall TRurPlanCalendar::MouseMove(Classes::TShiftState Shift, int X, i
   EndDC();
   }
 
-void TRurPlanCalendar::StartDC(int &x,int &y)
+void TRurPlanCalendar::StartDC(int &x, int &y)
   {
-  Canvas->Handle=::GetDC(Handle);
-  ::SetWindowOrgEx(Canvas->Handle,0,VertScrollBar->Position,0);
-  y+=VertScrollBar->Position;
+  //dc_count++;
+  //if(dc_count>1)
+  //  return;
+  //DEBUG(__FUNC__)
+  Canvas->Handle = ::GetDC(Handle);
+  ::SetWindowOrgEx(Canvas->Handle, 0, VertScrollBar->Position, 0);
+  y += VertScrollBar->Position;
   }
 
 void TRurPlanCalendar::EndDC()
   {
-  ::ReleaseDC(Handle,Canvas->Handle);
-  Canvas->Handle=0;
+  //if(dc_count>0)
+  //  dc_count--;
+  //if(dc_count)
+  //  return;
+  //DEBUG(__FUNC__)
+  ::ReleaseDC(Handle, Canvas->Handle);
+  Canvas->Handle = 0;
   }
 
 ///
@@ -2030,15 +2055,16 @@ Invalidate();
 }
 
 void __fastcall TRurPlanCalendar::DblClick(void)
+{
+DEBUG(__FUNC__)
+drag=false;
+if(rca.si && FOnEditTerm) // poviem, ze selektol termin
+  FOnEditTerm(this,rca.si);
+else if(FOnDblClick)
   {
-  drag=false;  
-  if(rca.si && FOnEditTerm) // poviem, ze selektol termin
-    FOnEditTerm(this,rca.si);
-  else if(FOnDblClick)
-    {
-    FOnDblClick(this);
-    }
+  FOnDblClick(this);
   }
+}
 
 
 void __fastcall TRurPlanCalendar::SetPDobaZaciatok(int value)

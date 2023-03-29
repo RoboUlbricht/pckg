@@ -139,6 +139,7 @@ private:
   TRurPlanCalendarHeader *pbh; ///< Sem si niekedy vykresluje veci, ktore nemaju rolovat
   Word FCommand;
   TPopupMenu *FVlastneMenu;
+  int dc_count;
 
   MESSAGE void __fastcall WMPaint(Messages::TWMPaint &Message);
   void __fastcall SetColorNoc(TColor value);
@@ -207,6 +208,7 @@ protected:
   DYNAMIC bool __fastcall DoMouseWheelUp(Classes::TShiftState Shift, const TPoint &MousePos);
   DYNAMIC TPopupMenu* __fastcall GetPopupMenu(void);
   void __fastcall MMenuExecute(TObject *Sender);
+  void DebugString(String s);
 
 public:
   __fastcall TRurPlanCalendar(TComponent* Owner);
