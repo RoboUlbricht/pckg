@@ -1880,6 +1880,7 @@ switch(FTyp)
       }
     int uid = FindUserXY(X, Y);
     users->Selected = uid;
+    Paint();
     if(uid && FOnUserSelect)
       FOnUserSelect(this, uid);
     if(uid) {
