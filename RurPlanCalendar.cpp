@@ -617,7 +617,7 @@ if(poc==0) return;
 int xx=40;
 int sirka=ClientWidth-xx;
 int s1=sirka/poc;
-SelSirka = s1;
+SelSirka = s1 - 1;
 int por=0;
 int diff=ClientWidth-xx-s1*poc+1;
 for(v_users::iterator i=users->begin();i!=users->end();i++)
