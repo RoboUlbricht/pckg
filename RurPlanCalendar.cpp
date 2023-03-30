@@ -1952,21 +1952,7 @@ switch(FTyp)
   {
   case pcplan1:
     if(dragmode>0) {
-      DrawDraggedItem();
-      rca.select = draggeditem;
-      int a = dragrect.Top / 20;
-      int b = dragrect.Bottom / 20;
-      if(a<0) {b += -a; a = 0;}
-      if(b>FBunkaCount) {a -= b-FBunkaCount; b = FBunkaCount;}
-      TDateTime t1 = FDatum_od + ColToTime(a);
-      TDateTime t2 = FDatum_do + ColToTime(b);
-      if(rca.si && FOnSelTerm2)
-        FOnSelTerm2(this, rca.si);
-      if(FOnMoveTerm) { // poviem, ze selektol termin
-        RurCalendarItem *ri = &rca[draggeditem];
-        if(!(ri->from==t1 && ri->to==t2))
-          FOnMoveTerm(this, ri, t1, t2);
-        }
+      LMouseUpEvents(FDatum_od, FDatum_do);
       return;
       }
     SelBunka2 = Y/20 + 1;
@@ -1991,24 +1977,14 @@ switch(FTyp)
     break;
   case pcplan5:
     if(dragmode>0) {
-      DrawDraggedItem();
-      rca.select = draggeditem;
-      int a = dragrect.Top / 20;
-      int b = dragrect.Bottom / 20;
-      if(a<0) {b += -a; a = 0;}
-      if(b>FBunkaCount) {a -= b-FBunkaCount; b = FBunkaCount;}
-      TDateTime t1 = days_selected->d + ColToTime(a);
-      TDateTime t2 = days_selected->d + ColToTime(b);
-      if(rca.si && FOnSelTerm2)
-        FOnSelTerm2(this, rca.si);
-      if(FOnMoveTerm) { // poviem, ze selektol termin
-        RurCalendarItem *ri = &rca[draggeditem];
-        if(!(ri->from==t1 && ri->to==t2))
-          FOnMoveTerm(this, ri, t1, t2);
-        }
+      LMouseUpEvents(days_selected->d, days_selected->d);
       return;
       }
   case pcplanU:
+    if(dragmode>0) {
+      LMouseUpEvents(FDatum, FDatum);
+      return;
+      }
     sel=rca.FindXY(X,Y);
     if(sel!=-1)
       {
@@ -2026,6 +2002,28 @@ switch(FTyp)
   case pcplan7:
   case pcplan31:
     break;
+  }
+}
+
+///
+/// Vyvola eventy pri pusteni lavej mysky
+///
+void TRurPlanCalendar::LMouseUpEvents(TDateTime dtb, TDateTime dte)
+{
+DrawDraggedItem();
+rca.select = draggeditem;
+int a = dragrect.Top / 20;
+int b = dragrect.Bottom / 20;
+if(a<0) {b += -a; a = 0;}
+if(b>FBunkaCount) {a -= b-FBunkaCount; b = FBunkaCount;}
+TDateTime t1 = dtb + ColToTime(a);
+TDateTime t2 = dte + ColToTime(b);
+if(rca.si && FOnSelTerm2)
+  FOnSelTerm2(this, rca.si);
+if(FOnMoveTerm) { // poviem, ze selektol termin
+  RurCalendarItem *ri = &rca[draggeditem];
+  if(!(ri->from==t1 && ri->to==t2))
+    FOnMoveTerm(this, ri, t1, t2);
   }
 }
 

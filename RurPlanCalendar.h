@@ -169,6 +169,7 @@ private:
   DYNAMIC void __fastcall Resize(void);
   void LMouseDown(int X,int Y);
   void LMouseUp(int X,int Y);
+  void LMouseUpEvents(TDateTime dtb, TDateTime dte);
   void RMouseUp(int X,int Y);
   void StartDC(int &x,int &y);
   void EndDC();
