@@ -1963,8 +1963,6 @@ switch(FTyp)
       int sel = rca.FindXY(X,Y);
       if(sel!=-1)
         {
-        ShowHint = true;
-        Hint = rca[rca.select].text;
         if(SelBunka!=-1) // odmazem staru selekciu
           {DrawSelection();SelBunka=-1;}
         DrawItem(Canvas, rca.si);
@@ -1988,8 +1986,6 @@ switch(FTyp)
     sel=rca.FindXY(X,Y);
     if(sel!=-1)
       {
-      ShowHint=true;
-      Hint=rca[rca.select].text;
       if(SelBunka!=-1) // odmazem staru selekciu
         {DrawSelection();SelBunka=-1;}
       DrawItem(Canvas,rca.si);
@@ -2238,14 +2234,21 @@ pbh->Visible=false;
 ///
 MESSAGE void __fastcall TRurPlanCalendar::CMHintShow(Messages::TMessage &Message)
 {
-PHintInfo ph=(PHintInfo)Message.LParam;
-RurCalendarItem *i=GetSelItem();
-if(i)
-  ph->HintStr=i->from.DateTimeString()+" - "+i->to.DateTimeString()+"\r\n"+i->text;
+PHintInfo ph = (PHintInfo)Message.LParam;
+TPoint p = ph->CursorPos;
+p.y += VertScrollBar->Position;
+int sel = rca.FindXY2(p.x, p.y);
+RurCalendarItem *i = sel!=-1 ? &rca[sel] : NULL;
+if(i) {
+  ph->HintStr = i->from.DateTimeString() + " - " + i->to.DateTimeString() + "\r\n" + i->text;
+  ph->HintPos = ClientToScreen(TPoint(i->r.left, i->r.bottom - VertScrollBar->Position));
+  ph->CursorRect = i->r;
+  //ph->CursorRect = Rect(0, 0, 100, 100);
+  //ph->HideTimeout = 5000;
+  }
 else
-  ph->HintStr="";
-ph->ReshowTimeout=2000;
-Message.Result=0;
+  ph->HintStr = "";
+Message.Result = 0;
 }
 
 bool __fastcall TRurPlanCalendar::DoMouseWheelDown(Classes::TShiftState Shift, const TPoint &MousePos)
