@@ -308,6 +308,7 @@ private:
   void DrawItem(TCanvas *c,TRurPlanCalendarHeaderItem *i);
   DYNAMIC void __fastcall Resize(void);
   MESSAGE void __fastcall CMHintShow(Messages::TMessage &Message);
+  TRurPlanCalendarHeaderItem* FindItem(int X, int Y);
 
 protected:
   virtual void __fastcall CreateParams(TCreateParams &Params);

@@ -2243,8 +2243,6 @@ if(i) {
   ph->HintStr = i->from.DateTimeString() + " - " + i->to.DateTimeString() + "\r\n" + i->text;
   ph->HintPos = ClientToScreen(TPoint(i->r.left, i->r.bottom - VertScrollBar->Position));
   ph->CursorRect = i->r;
-  //ph->CursorRect = Rect(0, 0, 100, 100);
-  //ph->HideTimeout = 5000;
   }
 else
   ph->HintStr = "";
@@ -2574,21 +2572,34 @@ Canvas->Handle=0;
 ///
 MESSAGE void __fastcall TRurPlanCalendarHeader::CMHintShow(Messages::TMessage &Message)
 {
-PHintInfo ph=(PHintInfo)Message.LParam;
-if(sel)
+PHintInfo ph = (PHintInfo)Message.LParam;
+TPoint p = ph->CursorPos;
+p.y += VertScrollBar->Position;
+TRurPlanCalendarHeaderItem *i = FindItem(p.x, p.y);
+if(i)
   {
-  RurCalendarItem *i=sel->ri;
-  ph->HintStr=i->from.DateTimeString()+" - "+i->to.DateTimeString()+"\r\n"+i->text;
+  ph->HintStr = i->ri->from.DateTimeString()+" - "+i->ri->to.DateTimeString()+"\r\n"+i->ri->text;
+  ph->HintPos = ClientToScreen(TPoint(i->r.left, i->r.bottom - VertScrollBar->Position));
+  ph->CursorRect = i->r;
   }
 else
   ph->HintStr="";
-ph->ReshowTimeout=2000;
 Message.Result=0;
 }
 
 RurCalendarItem* TRurPlanCalendarHeader::GetSelItem()
 {
 if(sel) return sel->ri;
+return NULL;
+}
+
+TRurPlanCalendarHeaderItem* TRurPlanCalendarHeader::FindItem(int X, int Y)
+{
+for(v_items::iterator i=items.begin();i!=items.end();i++)
+  {
+  if(PtInRect(&i->r,TPoint(X,Y))) // klik zasiahol
+    return &(*i);
+  }
 return NULL;
 }
 
