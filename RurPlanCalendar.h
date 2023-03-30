@@ -164,6 +164,7 @@ private:
   DYNAMIC void __fastcall MouseUp(Controls::TMouseButton Button, Classes::TShiftState Shift, int X, int Y);
   DYNAMIC void __fastcall MouseDown(Controls::TMouseButton Button, Classes::TShiftState Shift, int X, int Y);
   DYNAMIC void __fastcall MouseMove(Classes::TShiftState Shift, int X, int Y);
+  void MouseMoveDragItem(int X, int Y);
   DYNAMIC void __fastcall DblClick(void);
   DYNAMIC void __fastcall Resize(void);
   void LMouseDown(int X,int Y);

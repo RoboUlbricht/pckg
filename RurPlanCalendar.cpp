@@ -1673,24 +1673,7 @@ void __fastcall TRurPlanCalendar::MouseMove(Classes::TShiftState Shift, int X, i
     {
     case pcplan1:
       if(dragmode>0) { // dragujeme termin
-        DrawDraggedItem();
-        int dify = Y - dragy;
-        switch(dragmode) {
-          case 1:
-            dragrect.Top = rca[draggeditem].r.Top + dify;
-            dragrect.Bottom = rca[draggeditem].r.Bottom + dify;
-            break;
-          case 2:
-            dragrect.Top = rca[draggeditem].r.Top + dify;
-            break;
-          case 3:
-            dragrect.Bottom = rca[draggeditem].r.Bottom + dify;
-            break;
-          }
-        // zaokruhlenie na bunky
-        dragrect.Top = dragrect.Top/20*20;
-        dragrect.Bottom = dragrect.Bottom/20*20;
-        DrawDraggedItem();
+        MouseMoveDragItem(X, Y);
         EndDC();
         return;
         }
@@ -1702,26 +1685,10 @@ void __fastcall TRurPlanCalendar::MouseMove(Classes::TShiftState Shift, int X, i
         SelBunka2 = tmp;
         }
       break;
+
     case pcplan5:
       if(dragmode>0) { // dragujeme termin
-        DrawDraggedItem();
-        int dify = Y - dragy;
-        switch(dragmode) {
-          case 1:
-            dragrect.Top = rca[draggeditem].r.Top + dify;
-            dragrect.Bottom = rca[draggeditem].r.Bottom + dify;
-            break;
-          case 2:
-            dragrect.Top = rca[draggeditem].r.Top + dify;
-            break;
-          case 3:
-            dragrect.Bottom = rca[draggeditem].r.Bottom + dify;
-            break;
-          }
-        // zaokruhlenie na bunky
-        dragrect.Top = dragrect.Top/20*20;
-        dragrect.Bottom = dragrect.Bottom/20*20;
-        DrawDraggedItem();
+        MouseMoveDragItem(X, Y);
         EndDC();
         return;
       }
@@ -1733,9 +1700,48 @@ void __fastcall TRurPlanCalendar::MouseMove(Classes::TShiftState Shift, int X, i
         SelBunka2 = tmp;
         }
       break;
+
+    case pcplanU:
+      if(dragmode>0) { // dragujeme termin
+        MouseMoveDragItem(X, Y);
+        EndDC();
+        return;
+      }
+
+      if(SelBunka!=-1 && users->Selected) { // selektujeme bunky
+        int tmp = Y/20+1;
+        TRurPlanCalendarUser *u = users->SelectedUser;
+        RRect r8(u->r.Left, SelBunka2*20, u->r.Left+SelSirka, tmp*20);
+        ::InvertRect(Canvas->Handle, &r8);
+        SelBunka2 = tmp;
+        }
+      break;
+
     }
   EndDC();
   }
+
+void TRurPlanCalendar::MouseMoveDragItem(int X, int Y)
+{
+DrawDraggedItem();
+int dify = Y - dragy;
+switch(dragmode) {
+  case 1:
+    dragrect.Top = rca[draggeditem].r.Top + dify;
+    dragrect.Bottom = rca[draggeditem].r.Bottom + dify;
+    break;
+  case 2:
+    dragrect.Top = rca[draggeditem].r.Top + dify;
+    break;
+  case 3:
+    dragrect.Bottom = rca[draggeditem].r.Bottom + dify;
+    break;
+  }
+// zaokruhlenie na bunky
+dragrect.Top = dragrect.Top/20*20;
+dragrect.Bottom = dragrect.Bottom/20*20;
+DrawDraggedItem();
+}
 
 void TRurPlanCalendar::StartDC(int &x, int &y)
   {
