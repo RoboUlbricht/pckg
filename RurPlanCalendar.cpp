@@ -1992,7 +1992,7 @@ switch(FTyp)
       LMouseUpEvents(FDatum, FDatum);
       return;
       }
-    sel=rca.FindXY(X,Y);
+    sel = rca.FindXY(X,Y);
     if(sel!=-1)
       {
       if(SelBunka!=-1) // odmazem staru selekciu
