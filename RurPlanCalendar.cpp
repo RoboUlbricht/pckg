@@ -311,6 +311,7 @@ days_selecteditem=NULL;
 FOnSelTerm2=NULL;
 users =new TRurPlanCalendarUsers(this);
 FOnUserSelect = NULL;
+drag_picture = new TBitmap;
 }
 
 ///
@@ -318,6 +319,7 @@ FOnUserSelect = NULL;
 ///
 __fastcall TRurPlanCalendar::~TRurPlanCalendar()
 {
+delete drag_picture;
 if(FVlastneMenu) {PopupMenu=NULL;delete FVlastneMenu;}
 delete bpruzokh;
 delete FCanvas;
@@ -1590,9 +1592,13 @@ StartDC(X,Y);
 switch(Button)
   {
   case mbLeft:
-    LMouseDown(X,Y);
-    drag=true;
-    dragy=Y;
+    LMouseDown(X, Y);
+    drag = true;
+    dragy = Y;
+    drag_picture->Width = ClientWidth;
+    drag_picture->Height = ClientHeight;
+    BitBlt(drag_picture->Canvas->Handle, 0, 0, ClientWidth, ClientHeight, Canvas->Handle, 0, 0, SRCCOPY);
+    //BitBlt(Canvas->Handle, 0, 0, ClientWidth, ClientHeight, drag_picture->Canvas->Handle, 10, 10, SRCCOPY);
     if(dragmode>0)
       {
       if(SelBunka!=-1) // predtym mal selektnute v poli a ideme na polozku
@@ -1805,14 +1811,17 @@ void TRurPlanCalendar::DrawSelTermin()
 void TRurPlanCalendar::DrawDraggedItem()
   {
   RRect r8(dragrect);
-  Canvas->Pen->Mode=pmXor;
-  Canvas->Pen->Style = psDot;
-  Canvas->MoveTo(r8.Left,r8.Top);
-  Canvas->LineTo(r8.Right-1,r8.Top);
-  Canvas->LineTo(r8.Right-1,r8.Bottom-1);
-  Canvas->LineTo(r8.Left,r8.Bottom-1);
-  Canvas->LineTo(r8.Left,r8.Top);
-  Canvas->Pen->Mode=pmCopy;
+  Canvas->DrawFocusRect(r8);
+  return;
+  Canvas->Pen->Mode = pmXor;
+  Canvas->Pen->Style = psDashDot;
+  //Canvas->Pen->Width = 2;
+  Canvas->MoveTo(r8.Left, r8.Top);
+  Canvas->LineTo(r8.Right-1, r8.Top);
+  Canvas->LineTo(r8.Right-1, r8.Bottom-1);
+  Canvas->LineTo(r8.Left, r8.Bottom-1);
+  Canvas->LineTo(r8.Left, r8.Top);
+  Canvas->Pen->Mode = pmCopy;
   Canvas->Pen->Style = psSolid;
   }
 
@@ -2079,6 +2088,7 @@ switch(FTyp)
       return true;
       }
   case pcplan5:
+  case pcplanU:
     if(SelBunka==-1) {
       from = FDatum + TDateTime(8,0,0,0);
       to = FDatum + TDateTime(8,30,0,0);

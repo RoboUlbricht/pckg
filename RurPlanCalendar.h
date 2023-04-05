@@ -144,6 +144,7 @@ private:
   int dragmode; // co bude robit dragovacka (1 cely termin, 2 horny okraj, 3 dolny okraj)
   int draggeditem;
   TRect dragrect;
+  Graphics::TBitmap *drag_picture;
   AnsiString FMeniny;
   Graphics::TBitmap *bpruzokh;
   int BarHeight;  ///< Rezervovana vyska pre pruzok
