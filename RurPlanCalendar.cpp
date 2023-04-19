@@ -2027,7 +2027,8 @@ if(rca.si && FOnSelTerm2)
   FOnSelTerm2(this, rca.si);
 if(FOnMoveTerm) { // poviem, ze selektol termin
   RurCalendarItem *ri = &rca[draggeditem];
-  if(!(ri->from==t1 && ri->to==t2))
+  //if(!(ri->from==t1 && ri->to==t2))
+  if(abs(dragrect.Top - ri->r.Top)>10 || abs(dragrect.Bottom - ri->r.Bottom)>10)
     FOnMoveTerm(this, ri, t1, t2);
   }
 }
