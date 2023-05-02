@@ -18,6 +18,9 @@
 #define DEBUG(s)
 //#define DEBUG(s) DebugString(s);
 
+#define CIARA_DARK TColor(RGB(140, 163, 240))
+#define CIARA_LIGHT TColor(RGB(216, 216, 216))
+
 void Paint3dRamik(TCanvas *CC,TRect r1,AnsiString as);
 
 //---------------------------------------------------------------------------
@@ -845,9 +848,9 @@ for(v_users::iterator i=users->begin();i!=users->end();i++)
   int ww=i->r.Right-i->r.Left;
   for(int i=0;i<24;i++)
     {
-    Canvas->Pen->Color=TColor(0xA2DBF6);
+    Canvas->Pen->Color = CIARA_DARK;
     Canvas->MoveTo(x,i*FBunkaHeight*FBunkaMultiply);Canvas->LineTo(x+ww,i*FBunkaHeight*FBunkaMultiply);
-    Canvas->Pen->Color=TColor(clBtnFace);
+    Canvas->Pen->Color = CIARA_LIGHT;
     for(int j=1;j<FBunkaMultiply;j++)
       {Canvas->MoveTo(x,i*FBunkaHeight*FBunkaMultiply+FBunkaHeight*j);Canvas->LineTo(x+ww,i*FBunkaHeight*FBunkaMultiply+FBunkaHeight*j);}
     }
@@ -1050,9 +1053,9 @@ void TRurPlanCalendar::DrawGrid(int x,int ww,TDateTime d, int vect)
 
   for(int i=0;i<24;i++)
     {
-    Canvas->Pen->Color=TColor(0xA2DBF6);
+    Canvas->Pen->Color = CIARA_DARK;
     Canvas->MoveTo(x,i*FBunkaHeight*FBunkaMultiply);Canvas->LineTo(x+ww,i*FBunkaHeight*FBunkaMultiply);
-    Canvas->Pen->Color=TColor(clBtnFace);
+    Canvas->Pen->Color = CIARA_LIGHT;
     for(int j=1;j<FBunkaMultiply;j++)
       {Canvas->MoveTo(x,i*FBunkaHeight*FBunkaMultiply+FBunkaHeight*j);Canvas->LineTo(x+ww,i*FBunkaHeight*FBunkaMultiply+FBunkaHeight*j);}
     }

@@ -15,6 +15,12 @@
 
 #define SX 135
 #define SY 121
+#define COLOR_CAPTION TColor(RGB(230, 230, 230))
+#define COLOR_ODDO TColor(RGB(169, 186, 243))
+//#define COLOR_INACTIVE TColor(0x00BCF4FF)
+#define COLOR_INACTIVE TColor(RGB(230, 235, 255))
+//#define COLOR_INACTIVE clYellow
+
 //---------------------------------------------------------------------------
 // ValidCtrCheck is used to assure that the components created do not have
 // any pure virtual functions.
@@ -233,14 +239,15 @@ if(mesiac.prepared) return;
 int n;
 mesiac.dat_s=TDateTime(R,M+1,1);
 mesiac.dat_k=EndOfTheMonth(mesiac.dat_s);
-bool inactive=true;
-if(mesiac.dat_s<=FDatum && FDatum<=mesiac.dat_k) inactive=false;
+bool inactive = true;
+if(mesiac.dat_s<=FDatum && FDatum<=mesiac.dat_k)
+  inactive = false;
 
 for(int i=0;i<49;i++)
   {
   mesiac.day[i].Clear(); // cierne pismo, biely podklad
   if(FColorInactive && inactive)
-    mesiac.day[i].cbackground=TColor(0x00BCF4FF);
+    mesiac.day[i].cbackground = COLOR_INACTIVE;
   }
 // vikend je sedy
 for(int i=0;i<7;i++)
@@ -263,7 +270,7 @@ for(int k=0;k<7;k++) // os x
       if(dd==FDatum)
         cd.style|=TRCD_BLACKFRAME;
       if(FDatum_od<=dd && dd<=FDatum_do)
-        cd.cbackground=clBtnFace;
+        cd.cbackground = COLOR_ODDO;
       int nn=rca.Find(R,M+1,n);
       if(nn!=-1)
         {
@@ -319,7 +326,7 @@ int ofy=(Height-rr.bottom)/2;
 OffsetRect(&rr,ofx,ofy);
 rect_all=rr;
 if(FColorInactive)
-  CC->Brush->Color=TColor(0x00BCF4FF);
+  CC->Brush->Color = COLOR_INACTIVE;
 else
   CC->Brush->Color=TColor(0x00ffffff);
 CC->FillRect(rr);
@@ -343,16 +350,19 @@ for(int i=0;i<FRiadkov;i++)
     int X=rr.left+j*(1+bx*7);
 
     // horna plocha pre nazov mesiaca
-    CC->Brush->Color=TColor(clBtnFace);
+    bool inactive = true;
+    if(rcm.dat_s<=FDatum && FDatum<=rcm.dat_k)
+      inactive = false;
+    CC->Brush->Color = COLOR_CAPTION;
     RRect r1(X,Y,X+bx*7+1,Y+by);
     CC->FillRect(r1);
-    Frame3D(CC,r1,clBtnHighlight,clBtnShadow,1);
+    //Frame3D(CC, r1, clBtnHighlight, clBtnShadow, 1);
     String nazov_mesiaca;
     nazov_mesiaca.printf(L"%s %d",System::Sysutils::FormatSettings.LongMonthNames[M],R);
-    CC->Font->Color=TColor(clBlack);
-    CC->Font->Style=TFontStyles();
+    CC->Font->Color = TColor(clBlack);
+    CC->Font->Style = inactive ? TFontStyles() : TFontStyles()<<fsBold;
     ::DrawText(CC->Handle,nazov_mesiaca.c_str(),-1,&r1,DT_CENTER|DT_VCENTER|DT_SINGLELINE);
-    if(rcm.dat_s<=FDatum && FDatum<=rcm.dat_k && FColorInactive)
+    if(inactive==false && FColorInactive)
       {
       CC->Brush->Color=TColor(0x00ffffff);
       RRect r1(X,Y+by,X+bx*7+1,Y+by*8);
