@@ -2254,7 +2254,11 @@ p.y += VertScrollBar->Position;
 int sel = rca.FindXY2(p.x, p.y);
 RurCalendarItem *i = sel!=-1 ? &rca[sel] : NULL;
 if(i) {
-  ph->HintStr = i->from.DateTimeString() + " - " + i->to.DateTimeString() + "\r\n" + i->text;
+  String hnt = i->from.DateTimeString() + " - " + i->to.DateTimeString() + "\r\n" + i->text;
+  if(i->popis.Length())
+    hnt += "\r\n" + i->popis;
+  ph->HintStr = hnt;
+  ph->HintMaxWidth = 300;
   ph->HintPos = ClientToScreen(TPoint(i->r.left, i->r.bottom - VertScrollBar->Position));
   ph->CursorRect = i->r;
   }
@@ -2592,7 +2596,11 @@ p.y += VertScrollBar->Position;
 TRurPlanCalendarHeaderItem *i = FindItem(p.x, p.y);
 if(i)
   {
-  ph->HintStr = i->ri->from.DateTimeString()+" - "+i->ri->to.DateTimeString()+"\r\n"+i->ri->text;
+  String hnt = i->ri->from.DateTimeString() + " - " + i->ri->to.DateTimeString() + "\r\n" + i->ri->text;
+  if(i->ri->popis.Length())
+    hnt += "\r\n" + i->ri->popis;
+  ph->HintStr = hnt;
+  ph->HintMaxWidth = 300;
   ph->HintPos = ClientToScreen(TPoint(i->r.left, i->r.bottom - VertScrollBar->Position));
   ph->CursorRect = i->r;
   }

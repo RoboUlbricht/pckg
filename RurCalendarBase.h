@@ -17,11 +17,12 @@ struct RurCalendarItem
 //  TDateTime to_time;
   bool splnene; // splneny termin
   AnsiString text;
+  String popis;
 
   RurCalendarItem() {
-    hash=typ=0;
+    hash = typ = 0;
     uid = 0;
-    r.left=0; r.top=0; r.right=0; r.bottom=0;
+    r.left = 0; r.top = 0; r.right = 0; r.bottom = 0;
     splnene = false;
     }
   AnsiString Debug() {return text+" {"+r.left+","+r.top+","+r.right+","+r.bottom+"} <"+from.DateTimeString()+" "+to.DateTimeString()+">";}
@@ -34,7 +35,7 @@ public:
   int select; ///< Selektnute poradie
   RurCalendarItem *si;
 
-  RurCalendarArray() : RArray<RurCalendarItem>(64,64) {select=-1;si=NULL;}
+  RurCalendarArray() : RArray<RurCalendarItem>(64, 64) {select = -1; si = NULL;}
   int Find(int r,int m,int d);
   int Find(int r,int m,int d,int hodina);
   int FindXY(int x,int y);
