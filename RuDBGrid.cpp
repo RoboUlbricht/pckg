@@ -1211,7 +1211,9 @@ void TRurDBGrid::XMLInitName(AnsiString name)
 {
 if(TDirectory::Exists(view_path)) {
   String view = view_path + AnsiReplaceText(name, "::", ".") + ".json";
+
   if(TFile::Exists(view)) {
+  try {
     json_name = name;
     //json_name = "test"; // iba ked testujes
     TBytes bt = TFile::ReadAllBytes(view);
@@ -1297,6 +1299,11 @@ if(TDirectory::Exists(view_path)) {
 
     LoadView(last_view);
     return;
+    }
+
+  } catch (Exception &e) {
+    e.Message += "\r\n" + view;
+    Application->ShowException(&e);
     }
   }
 }
