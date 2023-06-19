@@ -980,6 +980,8 @@ try {
     }
 } __finally {
   user_views_activity--;
+  if(FOnColumnsChanged)
+    FOnColumnsChanged(this);
   }
 }
 
@@ -1054,8 +1056,8 @@ if(vys==mrOk) {
   UpdateViewsMenu(NULL);
   LoadView(col->lbZoznam->ItemIndex);
   }
-if(vys==mrOk && FOnColumnsChanged)
-  FOnColumnsChanged(this);
+//if(vys==mrOk && FOnColumnsChanged)
+//  FOnColumnsChanged(this);
 }
 
 ///

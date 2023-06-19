@@ -3,7 +3,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Poh'#318'ady'
-  ClientHeight = 337
+  ClientHeight = 414
   ClientWidth = 645
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -33,7 +33,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   end
   object Label1: TLabel
     Left = 200
-    Top = 176
+    Top = 256
     Width = 143
     Height = 13
     Caption = 'Zoznam u'#382#237'vate'#318'sk'#253'ch st'#314'pcov'
@@ -69,7 +69,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
     Left = 8
     Top = 27
     Width = 186
-    Height = 134
+    Height = 206
     ItemHeight = 13
     TabOrder = 0
     OnClick = lbZoznamClick
@@ -78,14 +78,14 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
     Left = 200
     Top = 27
     Width = 153
-    Height = 134
+    Height = 206
     ItemHeight = 13
     TabOrder = 1
     OnDblClick = aSRightExecute
   end
   object lbUser: TListBox
     Left = 200
-    Top = 195
+    Top = 275
     Width = 153
     Height = 134
     ItemHeight = 13
@@ -96,7 +96,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
     Left = 390
     Top = 27
     Width = 153
-    Height = 302
+    Height = 382
     ItemHeight = 13
     TabOrder = 5
   end
@@ -110,7 +110,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   end
   object btnURight: TButton
     Left = 359
-    Top = 195
+    Top = 275
     Width = 25
     Height = 25
     Action = aURight
@@ -118,7 +118,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   end
   object btnViewAdd: TButton
     Left = 8
-    Top = 195
+    Top = 275
     Width = 186
     Height = 25
     Action = aViewAdd
@@ -126,7 +126,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   end
   object btnViewRename: TButton
     Left = 8
-    Top = 226
+    Top = 306
     Width = 186
     Height = 25
     Action = aViewRename
@@ -134,7 +134,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   end
   object btnViewDelete: TButton
     Left = 8
-    Top = 257
+    Top = 337
     Width = 186
     Height = 25
     Action = aViewDelete
@@ -142,7 +142,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   end
   object btnMoveUp: TButton
     Left = 562
-    Top = 242
+    Top = 322
     Width = 75
     Height = 25
     Action = aMoveUp
@@ -151,7 +151,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   end
   object btnMoveDown: TButton
     Left = 562
-    Top = 273
+    Top = 353
     Width = 75
     Height = 25
     Action = aMoveDown
@@ -159,7 +159,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   end
   object btnDelete: TButton
     Left = 562
-    Top = 304
+    Top = 384
     Width = 75
     Height = 25
     Action = aDelete
