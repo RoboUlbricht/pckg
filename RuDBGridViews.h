@@ -67,6 +67,8 @@ __published:	// IDE-managed Components
 private:	// User declarations
   vColumns ucolumns;
 
+  void OznacZoznamStlpcov();
+
 public:		// User declarations
   __fastcall TRurDBGridViewsDlg(TComponent* Owner);
 

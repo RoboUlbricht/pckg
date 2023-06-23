@@ -51,6 +51,23 @@ if(lbZoznam->ItemIndex==-1)
 lbZoznamClick(NULL);
 }
 
+void TRurDBGridViewsDlg::OznacZoznamStlpcov()
+{
+int pos = lbZoznam->ItemIndex;
+if(pos==-1) return;
+TRurDBGridView &v = user_views[pos];
+
+int is = 0;
+for(vColumns::iterator i = grid->def_columns.begin(); i!=grid->def_columns.end(); i++) {
+  String predpona;
+  for(vColumns::iterator j=v.columns.begin(); j!=v.columns.end(); j++)
+    if(j->fieldname==i->fieldname)
+      predpona = "* ";
+  lbStlpce->Items->Strings[is] = predpona + i->caption;
+  is++;
+  }
+}
+
 ///
 /// Zobrazenie stlpcov
 ///
@@ -62,6 +79,9 @@ lbPStlpce->Items->Clear();
 for(vColumns::iterator i=v.columns.begin(); i!=v.columns.end(); i++) {
   lbPStlpce->Items->Add(i->caption);
   }
+
+// Zoznam stlpcov
+OznacZoznamStlpcov();
 }
 
 ///
@@ -109,6 +129,7 @@ for(vColumns::iterator i=v.columns.begin(); i!=v.columns.end(); i++) {
 v.columns.push_back(c);
 int x = lbPStlpce->Items->Add(c.caption);
 lbPStlpce->ItemIndex = x;
+OznacZoznamStlpcov();
 }
 
 ///
@@ -302,6 +323,7 @@ if(lbPStlpce->Items->Count>1) {
   TRurDBGridView &v = user_views[pos];
   v.columns.erase(v.columns.begin() + lbPStlpce->ItemIndex);
   lbPStlpce->Items->Delete(lbPStlpce->ItemIndex);
+  OznacZoznamStlpcov();
   }
 }
 
