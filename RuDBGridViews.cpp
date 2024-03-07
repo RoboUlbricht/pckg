@@ -343,3 +343,20 @@ if(lbZoznam->ItemIndex!=-1) {
 ((TAction*)Sender)->Enabled = ena;
 }
 
+///
+/// Odosle kliknutie na help do gridu
+///
+void __fastcall TRurDBGridViewsDlg::lblShowHelpClick(TObject *Sender)
+{
+grid->ShowHelp(this->Name);
+}
+
+///
+/// Stlacenie F1
+///
+void __fastcall TRurDBGridViewsDlg::FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift)
+{
+if(Key==112)
+  grid->ShowHelp(this->Name);
+}
+

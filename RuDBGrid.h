@@ -18,8 +18,9 @@ class TRurDBGrid;
 typedef void __fastcall (__closure *TRurDBGridWWWEvent)(AnsiString path);
 typedef bool __fastcall (__closure *TRurDBGridColEnabled)(TObject *Sender, AnsiString colname, AnsiString fieldname);
 typedef void __fastcall (__closure *TRurDBGridGroupEvent)(TObject *Sender);
-typedef void __fastcall (__closure *TRurDBGridSetupColumnsEvent)(TObject *Sender);
+typedef int __fastcall (__closure *TRurDBGridSetupColumnsEvent)(TObject *Sender);
 typedef void __fastcall (__closure *TRurDBGridTitleClickSort)(TColumn *col);
+typedef void __fastcall (__closure *TRurDBGridHelpEvent)(String path);
 extern AnsiString (*TranslateGrid)(AnsiString s);
 extern int GRID_RK_DELAY;
 
@@ -91,6 +92,7 @@ private:
         TRurDBGridGroupEvent FOnGroupCreate;
         TRurDBGridGroupEvent FOnGroupEdit;
         TRurDBGridSetupColumnsEvent FOnSetupColumns;
+        TRurDBGridHelpEvent FOnHelp;
         TButton *tmpb;
         TDateTime  ds_time; ///< cas, kedy to ma vypuknut
         TTimer    *ds_timer;///< timer ktory to sleduje
@@ -176,6 +178,7 @@ public:
 	void ReagujNaMenu(TMenuItem *menu);
   void DisableAutosave();
   String GetColOrder(TColumn *col, String def = EmptyStr);
+  void ShowHelp(String id);
 
   friend class TRurDBGridConfigurator;
   friend class TRurDBGridColumnsDlg;
@@ -202,6 +205,7 @@ __published:
   __property TRurDBGridSetupColumnsEvent OnSetupColumns  = { read=FOnSetupColumns, write=FOnSetupColumns };
   __property TNotifyEvent OnExport  = { read=FOnExport, write=FOnExport };
   __property String ExtendedColumns = {read=FExtendedColumns, write=SetExtendedColumns};
+  __property TRurDBGridHelpEvent OnHelp = {read=FOnHelp, write=FOnHelp};
 };
 //---------------------------------------------------------------------------
 #endif

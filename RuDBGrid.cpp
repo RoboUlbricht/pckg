@@ -95,6 +95,7 @@ FOnColEnable=NULL;
 FOnGroupCreate = NULL;
 FOnGroupEdit = NULL;
 FOnSetupColumns = NULL;
+FOnHelp = NULL;
 trt=0; // nemam table
 cfg=0; // nemam konfiguraciu
 ds_timer=NULL;
@@ -1032,7 +1033,9 @@ if(FOnGroupEdit) {
 void TRurDBGrid::SetupColumns()
 {
 if(FOnSetupColumns) {
-  FOnSetupColumns(this);
+  int vys = FOnSetupColumns(this);
+  if(vys==mrOk && FOnColumnsChanged)
+    FOnColumnsChanged(this);
   return;
 }
 rur::ptr<TRurDBGridColumnsDlg> col(new TRurDBGridColumnsDlg(this));
@@ -1049,6 +1052,8 @@ void TRurDBGrid::SetupViews()
 {
 rur::ptr<TRurDBGridViewsDlg> col(new TRurDBGridViewsDlg(this));
 col->grid = this;
+if(FOnHelp)
+  col->lblShowHelp->Visible = true;
 int vys = col->ShowModal();
 if(vys==mrOk) {
   user_views = col->user_views;
@@ -1058,6 +1063,15 @@ if(vys==mrOk) {
   }
 //if(vys==mrOk && FOnColumnsChanged)
 //  FOnColumnsChanged(this);
+}
+
+///
+/// Vyvola help
+///
+void TRurDBGrid::ShowHelp(String id)
+{
+if(FOnHelp)
+  FOnHelp(id);
 }
 
 ///

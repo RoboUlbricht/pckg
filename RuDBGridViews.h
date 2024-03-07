@@ -47,6 +47,7 @@ __published:	// IDE-managed Components
   TAction *aMoveUp;
   TAction *aMoveDown;
   TAction *aDelete;
+  TLabel *lblShowHelp;
   void __fastcall FormShow(TObject *Sender);
   void __fastcall lbZoznamClick(TObject *Sender);
   void __fastcall aViewAddExecute(TObject *Sender);
@@ -64,6 +65,8 @@ __published:	// IDE-managed Components
   void __fastcall aViewDeleteUpdate(TObject *Sender);
   void __fastcall aDeleteExecute(TObject *Sender);
   void __fastcall aDeleteUpdate(TObject *Sender);
+  void __fastcall lblShowHelpClick(TObject *Sender);
+  void __fastcall FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 private:	// User declarations
   vColumns ucolumns;
 

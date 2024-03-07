@@ -11,9 +11,11 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   ShowHint = True
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -44,6 +46,23 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
     Width = 29
     Height = 13
     Caption = 'St'#314'pce'
+  end
+  object lblShowHelp: TLabel
+    Left = 562
+    Top = 70
+    Width = 57
+    Height = 13
+    Cursor = crHelp
+    Hint = 'Integrovan'#253' manu'#225'l'
+    Caption = 'Manu'#225'l (F1)'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlue
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    Visible = False
+    OnClick = lblShowHelpClick
   end
   object btnOk: TButton
     Left = 562
