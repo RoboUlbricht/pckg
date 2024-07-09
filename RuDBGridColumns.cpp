@@ -243,7 +243,7 @@ user_id=_user_id;
 ///
 /// Ulozenie aktualnej pozicie gridu
 ///
-void TRurDBGridConfigurator::SaveGrid(TRurDBGrid *grid,AnsiString name)
+void TRurDBGridConfigurator::SaveGrid(Vcl::Dbgrids::TDBGrid *grid, AnsiString name)
 {
 if(save && save->Active)
   {

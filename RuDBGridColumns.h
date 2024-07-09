@@ -23,6 +23,12 @@
 class XMLConfig;
 class TRurDBGrid;
 
+namespace Vcl {
+namespace Dbgrids {
+class TDBGrid;
+}
+}
+
 ///
 /// Konfiguracny program
 ///
@@ -48,7 +54,7 @@ public:
 #else
   void Init(AnsiString table,TFDConnection *c, int _user_id);
 #endif
-  void SaveGrid(TRurDBGrid *grid,AnsiString name);
+  void SaveGrid(Vcl::Dbgrids::TDBGrid *grid, AnsiString name);
   void ResetGrid(AnsiString name);
   void SaveData(String name, String data);
   String LoadData(String name);
