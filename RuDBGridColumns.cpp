@@ -215,6 +215,88 @@ if(xml->Locate("/columns/grid","id",name,"",true))
 return false;
 }
 
+bool TRurDBGridConfigurator::CreateColumns(Vcl::Dbgrids::TDBGrid *grid, AnsiString name, bool &saved)
+{
+saved = false;
+if(xml==0) return false;
+if(xml->Locate("/columns/grid", "id", name, "", true))
+  {
+  grid->Columns->Clear();
+  int poc = xml->Count();
+
+  int i = 0;
+  while(poc)
+    {
+    xml->NextNode();
+    AnsiString scaption = xml->ReadLocatePropertyString("caption");
+    if(TranslateGrid)
+      scaption = TranslateGrid(scaption);
+    AnsiString sfieldname = xml->ReadLocatePropertyString("fieldname");
+    AnsiString sname = xml->ReadLocatePropertyString("name");
+    if(sname.Length()==0) // nepomenovane pomenujem podla fieldu
+      sname = sfieldname;
+    AnsiString ssort = xml->ReadLocatePropertyString("sort");
+    AnsiString swidth = xml->ReadLocatePropertyString("width");
+    AnsiString svisible = xml->ReadLocatePropertyString("visible");
+    AnsiString smail = xml->ReadLocatePropertyString("mail");
+    AnsiString swww = xml->ReadLocatePropertyString("www");
+
+    TColumn *c = grid->Columns->Add();
+    c->Title->Caption = scaption;
+    c->FieldName = sfieldname;
+    c->Width = swidth.ToIntDef(64);
+    c->Visible = svisible=="1";
+    if(smail=="1" || swww=="1") // maily farbim na modro
+      c->Font->Color = clBlue;
+
+    poc--;
+    i++;
+    }
+
+  // uzivatelske zmeny sledujeme
+  if(save)
+    {
+    if(save->Locate("nazov", name, TLocateOptions())) // a naslo uzivatelsky zaznam
+      {
+      saved = true;
+      if(user) delete user;
+      user = new XMLConfig;
+      user->LoadXML(save->FieldByName("hodnota")->AsString);
+      user->LocateList("/user");
+      poc = user->Count();
+      int por = 0;
+      while(poc)
+        {
+        user->NextNode();
+        AnsiString sfieldname = user->ReadLocatePropertyString("fieldname");
+        AnsiString swidth = user->ReadLocatePropertyString("width");
+        AnsiString svisible = user->ReadLocatePropertyString("visible");
+
+        int p = grid->Columns->Count;
+        for(int i=0; i<p; i++)
+          {
+          TColumn *col = grid->Columns->operator [](i);
+          if(col->FieldName==sfieldname)
+            {
+            int w = swidth.ToIntDef(64);
+            if(w!=-1)
+              col->Width = w;
+            col->Visible = svisible=="1";
+            try {
+            if(por<p)
+              col->Index = por++; // presunieme poradie
+            } catch(...) {}
+            }
+          }
+        poc--;
+        }
+      }
+    }
+  return true;
+  }
+return false;
+}
+
 ///
 /// Natavenie ukladania konfiguracie do databazy
 ///

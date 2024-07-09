@@ -49,6 +49,7 @@ public:
   void Init(AnsiString path);
   void Close();
   bool CreateColumns(TRurDBGrid *grid, AnsiString name, bool &saved);
+  bool CreateColumns(Vcl::Dbgrids::TDBGrid *grid, AnsiString name, bool &saved);
 #if defined(RUR_GRID_USE_DATASET)
   void Init(AnsiString table, TDataSet *_save, int _user_id);
 #else
@@ -65,6 +66,7 @@ void RurGridConfiguratorInit(AnsiString table, TDataSet *save, int user_id);
 #else
 void RurGridConfiguratorInit(AnsiString table,TFDConnection *c, int user_id);
 #endif
+extern TRurDBGridConfigurator rdgc;
 
 ///
 /// Dialog na nastavenie viditelnosti stlpcov
