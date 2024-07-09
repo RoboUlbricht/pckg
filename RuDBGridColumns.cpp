@@ -5,7 +5,7 @@
  * Obsah: TRurDBGridConfigurator, TRurDBGridColumnsDlg
  * Nastavovanie stlpcov na gride
  */
- 
+
 #include <vcl.h>
 #pragma hdrstop
 
@@ -14,6 +14,7 @@
 #include "XMLTools.h"
 #include <xmldoc.hpp>
 #include "xmltemplates.h"
+#include "CommonFunctions.h"
 
 //---------------------------------------------------------------------
 #pragma resource "*.dfm"
@@ -388,10 +389,6 @@ if(save && save->Active) {
 return "";
 }
 
-
-
-extern TRurDBGridConfigurator rdgc;
-
 ///
 /// Natavenie ukladania konfiguracie do databazy
 ///
@@ -406,6 +403,42 @@ void RurGridConfiguratorInit(AnsiString table,TFDConnection *c, int user_id)
 rdgc.Init(table,c,user_id);
 }
 #endif
+
+///
+/// Konstruktor
+///
+TRurDBGridMenu::TRurDBGridMenu(Vcl::Dbgrids::TDBGrid *g)
+: grid(g)
+{
+
+}
+
+///
+/// Vytvori menu pre grid
+///
+void TRurDBGridMenu::CreateMenu()
+{
+menu = grid->PopupMenu;
+if(menu==NULL)
+  menu = new TPopupMenu(grid);
+else
+  menu->Items->Add(NewLine());
+
+TMenuItem *mi;
+mi = NewItem("Ståpce...", 0, false, true, OnSetup, 0, "gItem1");
+mi->Hint = "Upravenie ståpcov v tabu¾ke";
+menu->Items->Add(mi);
+}
+
+///
+/// Vyvolanie nastavenia stlpcov
+///
+void __fastcall TRurDBGridMenu::OnSetup(TObject *Sender)
+{
+rur::ptr<TRurDBGridColumnsDlg> col(new TRurDBGridColumnsDlg(grid));
+col->grid = grid;
+int vys = col->ShowModal();
+}
 
 ///
 /// Konstruktor
@@ -467,8 +500,9 @@ for(int i=0; i<poc; i++)
   {
   TColumn *col = (TColumn*)lb->Items->Objects[i];
   col->Visible = lb->Checked[i];
-  if(col->Visible && grid->FOnColEnable)
-    col->Visible =grid->FOnColEnable(grid, col->Title->Caption, col->FieldName);
+  TRurDBGrid *rg = dynamic_cast<TRurDBGrid*>(grid);
+  if(col->Visible && rg && rg->FOnColEnable)
+    col->Visible =rg->FOnColEnable(rg, col->Title->Caption, col->FieldName);
   col->Index = i;
   }
 }

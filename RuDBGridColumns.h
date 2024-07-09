@@ -68,6 +68,19 @@ void RurGridConfiguratorInit(AnsiString table,TFDConnection *c, int user_id);
 #endif
 extern TRurDBGridConfigurator rdgc;
 
+class TRurDBGridMenu
+{
+  Vcl::Dbgrids::TDBGrid *grid;
+  TPopupMenu *menu;
+
+  void __fastcall OnSetup(TObject *Sender);
+
+public:
+  TRurDBGridMenu(Vcl::Dbgrids::TDBGrid *g);
+
+  void CreateMenu();
+};
+
 ///
 /// Dialog na nastavenie viditelnosti stlpcov
 ///
@@ -89,7 +102,7 @@ private:
 public:
 	virtual __fastcall TRurDBGridColumnsDlg(TComponent* AOwner);
 
-  TRurDBGrid *grid;
+  Vcl::Dbgrids::TDBGrid *grid;
 };
 //----------------------------------------------------------------------------
 extern PACKAGE TRurDBGridColumnsDlg *RurDBGridColumnsDlg;
