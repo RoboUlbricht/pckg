@@ -76,20 +76,20 @@ class TRurDBGridColumnsDlg : public TForm
 __published:
 	TButton *OKBtn;
 	TButton *CancelBtn;
-        TCheckListBox *lb;
-        TButton *Button1;
-        TButton *Button2;
-        TButton *Button3;
-        void __fastcall FormShow(TObject *Sender);
-        void __fastcall Roztiahnut(TObject *Sender);
-        void __fastcall Hore(TObject *Sender);
-        void __fastcall Dolu(TObject *Sender);
-        void __fastcall OKBtnClick(TObject *Sender);
+  TCheckListBox *lb;
+  TButton *Button1;
+  TButton *Button2;
+  TButton *Button3;
+  void __fastcall FormShow(TObject *Sender);
+  void __fastcall Roztiahnut(TObject *Sender);
+  void __fastcall Hore(TObject *Sender);
+  void __fastcall Dolu(TObject *Sender);
+  void __fastcall OKBtnClick(TObject *Sender);
 private:
 public:
 	virtual __fastcall TRurDBGridColumnsDlg(TComponent* AOwner);
 
-        TRurDBGrid *grid;
+  TRurDBGrid *grid;
 };
 //----------------------------------------------------------------------------
 extern PACKAGE TRurDBGridColumnsDlg *RurDBGridColumnsDlg;

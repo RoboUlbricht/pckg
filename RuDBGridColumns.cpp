@@ -420,13 +420,14 @@ __fastcall TRurDBGridColumnsDlg::TRurDBGridColumnsDlg(TComponent* AOwner)
 ///
 void __fastcall TRurDBGridColumnsDlg::FormShow(TObject *Sender)
 {
-int poc=grid->Columns->Count;
-for(int i=0;i<poc;i++)
+int poc = grid->Columns->Count;
+for(int i=0; i<poc; i++)
   {
-  int pos=lb->Items->AddObject(grid->Columns->operator [](i)->Title->Caption,
-                               (TObject*)grid->Columns->operator [](i));
+  int pos = lb->Items->AddObject(
+    grid->Columns->operator [](i)->Title->Caption,
+    (TObject*)grid->Columns->operator [](i));
   if(grid->Columns->operator [](i)->Visible)
-    lb->Checked[pos]=true;
+    lb->Checked[pos] = true;
   }
 }
 
@@ -444,7 +445,7 @@ void __fastcall TRurDBGridColumnsDlg::Roztiahnut(TObject *Sender)
 void __fastcall TRurDBGridColumnsDlg::Hore(TObject *Sender)
 {
 if(lb->Items->Count>1 && lb->ItemIndex>0)
-  lb->Items->Exchange(lb->ItemIndex,lb->ItemIndex-1);
+  lb->Items->Exchange(lb->ItemIndex, lb->ItemIndex-1);
 }
 
 ///
@@ -453,7 +454,7 @@ if(lb->Items->Count>1 && lb->ItemIndex>0)
 void __fastcall TRurDBGridColumnsDlg::Dolu(TObject *Sender)
 {
 if(lb->Items->Count>1 && lb->ItemIndex<lb->Items->Count-1)
-  lb->Items->Exchange(lb->ItemIndex,lb->ItemIndex+1);
+  lb->Items->Exchange(lb->ItemIndex, lb->ItemIndex+1);
 }
 
 ///
@@ -461,15 +462,14 @@ if(lb->Items->Count>1 && lb->ItemIndex<lb->Items->Count-1)
 ///
 void __fastcall TRurDBGridColumnsDlg::OKBtnClick(TObject *Sender)
 {
-int poc=lb->Items->Count;
-for(int i=0;i<poc;i++)
+int poc = lb->Items->Count;
+for(int i=0; i<poc; i++)
   {
-  TColumn *col=(TColumn*)lb->Items->Objects[i];
-  col->Visible=lb->Checked[i];
+  TColumn *col = (TColumn*)lb->Items->Objects[i];
+  col->Visible = lb->Checked[i];
   if(col->Visible && grid->FOnColEnable)
-    col->Visible=grid->FOnColEnable(grid,col->Title->Caption,col->FieldName);
-  col->Index=i;
+    col->Visible =grid->FOnColEnable(grid, col->Title->Caption, col->FieldName);
+  col->Index = i;
   }
 }
-//---------------------------------------------------------------------------
 
