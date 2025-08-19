@@ -86,7 +86,7 @@ class TRurDBGridMenu
   void __fastcall OnBunka(TObject *Sender);
 
 public:
-  TRurDBGridMenu(Vcl::Dbgrids::TDBGrid *g, int f = rdgmTABULKA|rdgmBUNKA|rdgmSTLPCE);
+  TRurDBGridMenu(Vcl::Dbgrids::TDBGrid *g, int f = rdgmTABULKA|rdgmBUNKA);
 
   void CreateMenu();
 
