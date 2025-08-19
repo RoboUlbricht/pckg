@@ -71,55 +71,56 @@ TColumn *col;
 class PACKAGE TRurDBGrid : public TSMDBGrid
 {
 private:
-        TRurTable *trt; // pointer na moju table
-        TDataSetCfg *cfg; // pointer na moju konfiguraciu
-        AnsiString FRIniName;
-        bool FTitleSort;
-        bool FKeyLocateRecord;
-        int FSort;
-        Word FCommand;
-        TPopupMenu *FVlastneMenu;
-        TMenuItem *mih[5];
-        TNotifyEvent FOnBeforeKeyLocate,FOnAfterKeyLocate;
-        TNotifyEvent FOnDelayedScroll;
-        TNotifyEvent FOnColumnsChanged;
-        TRurDBGridTitleClickSort FOnTitleClickSort;
-        TRurDBGridWWWEvent FOnEmail;
-        TRurDBGridWWWEvent FOnWWW;
-        TDBGridClickEvent  FOnCellCheckClick;
-        TDBGridClickEvent  FOnCellClick2;
-        TRurDBGridColEnabled FOnColEnable;
-        TRurDBGridGroupEvent FOnGroupCreate;
-        TRurDBGridGroupEvent FOnGroupEdit;
-        TRurDBGridSetupColumnsEvent FOnSetupColumns;
-        TRurDBGridHelpEvent FOnHelp;
-        TButton *tmpb;
-        TDateTime  ds_time; ///< cas, kedy to ma vypuknut
-        TTimer    *ds_timer;///< timer ktory to sleduje
-        int roll_koliesko;  ///< pouzite na znizovanie citlivosti kolieska
+  TRurTable *trt; // pointer na moju table
+  TDataSetCfg *cfg; // pointer na moju konfiguraciu
+  AnsiString FRIniName;
+  bool FTitleSort;
+  bool FKeyLocateRecord;
+  int FSort;
+  Word FCommand;
+  TPopupMenu *FVlastneMenu;
+  TMenuItem *mih[5];
+  TNotifyEvent FOnBeforeKeyLocate,FOnAfterKeyLocate;
+  TNotifyEvent FOnDelayedScroll;
+  TNotifyEvent FOnColumnsChanged;
+  TRurDBGridTitleClickSort FOnTitleClickSort;
+  TRurDBGridWWWEvent FOnEmail;
+  TRurDBGridWWWEvent FOnWWW;
+  TDBGridClickEvent  FOnCellCheckClick;
+  TDBGridClickEvent  FOnCellClick2;
+  TRurDBGridColEnabled FOnColEnable;
+  TRurDBGridGroupEvent FOnGroupCreate;
+  TRurDBGridGroupEvent FOnGroupEdit;
+  TRurDBGridSetupColumnsEvent FOnSetupColumns;
+  TRurDBGridHelpEvent FOnHelp;
+  TButton *tmpb;
+  TDateTime  ds_time; ///< cas, kedy to ma vypuknut
+  TTimer    *ds_timer;///< timer ktory to sleduje
+  int roll_koliesko;  ///< pouzite na znizovanie citlivosti kolieska
 
-        static String view_path;   ///< Cesta do adresara, kde su ulozne pohlady
-        vColumns def_columns; ///< Zoznam stlpcov z pohladu
-        vColumns ext_columns; ///< Zoznam stlpcov z pohladu (z rozsirenych vlastnosti)
-        vViews def_views;     ///< Zoznam pohladov
-        vViews user_views;    ///< Zoznam uzivatelskych pohladov (aj implicitne tam su)
-        String last_view;     ///< Posledny pohlad
-        TMenuItem *viewsItem; ///< Korenova polozka pohladov
-        int user_views_activity; ///< Prave ja cosi robim so stlpcami
-        String json_name;     ///< Pod akym menom sa uklada
+  static String view_path;   ///< Cesta do adresara, kde su ulozne pohlady
+  vColumns def_columns; ///< Zoznam stlpcov z pohladu
+  vColumns ext_columns; ///< Zoznam stlpcov z pohladu (z rozsirenych vlastnosti)
+  vViews def_views;     ///< Zoznam pohladov
+  vViews user_views;    ///< Zoznam uzivatelskych pohladov (aj implicitne tam su)
+  String last_view;     ///< Posledny pohlad
+  TMenuItem *viewsItem; ///< Korenova polozka pohladov
+  int user_views_activity; ///< Prave ja cosi robim so stlpcami
+  String json_name;     ///< Pod akym menom sa uklada
 
-        AnsiString xmlname; ///< Meno na ukladanie kofiguracie
-        bool configcolumns; ///< Ci moze konfigurovat stlpce
-        bool loadedcolumns; ///< Ci boli stlpce nastavene vlastnymi prostriedkami
-        TRurDBGridColumnName *names; ///< Zoznam pomenovanych stlpcov
-        int namescount;     ///< Pocet pomenovanych stlpcov
-        bool hide_indicator;///< Ma skryt dgIndicator po vypnuti multiselektu
-        TNotifyEvent FOnExport;
-        String FExtendedColumns;
-        String dead_key;
+  AnsiString xmlname; ///< Meno na ukladanie kofiguracie
+  bool configcolumns; ///< Ci moze konfigurovat stlpce
+  bool loadedcolumns; ///< Ci boli stlpce nastavene vlastnymi prostriedkami
+  TRurDBGridColumnName *names; ///< Zoznam pomenovanych stlpcov
+  int namescount;     ///< Pocet pomenovanych stlpcov
+  bool hide_indicator;///< Ma skryt dgIndicator po vypnuti multiselektu
+  TNotifyEvent FOnExport;
+  String FExtendedColumns;
+  String dead_key;
+  bool FEnableMultiselect; ///< Moze stlacat Ctrl-M
 
-        void __fastcall SetRIniName(AnsiString value);
-        AnsiString __fastcall GetRIniName();
+  void __fastcall SetRIniName(AnsiString value);
+  AnsiString __fastcall GetRIniName();
   DYNAMIC void __fastcall MouseDown(Controls::TMouseButton Button, Classes::TShiftState Shift, int X, int Y);
   DYNAMIC void __fastcall MouseUp(Controls::TMouseButton Button, Classes::TShiftState Shift, int X, int Y);
   void __fastcall MMenuExecute(TObject *Sender);
@@ -156,29 +157,30 @@ protected:
 //END_MESSAGE_MAP(TRurDBGrid)
 
 public:
-        __fastcall TRurDBGrid(TComponent* Owner);
-        __fastcall ~TRurDBGrid();
-        void CreateRColumns(TRurTable *tb,bool all=false);
-        void CreateRColumns(TDataSetCfg *_cfg,bool all=false);
-        void SaveSirky();
-        AnsiString GetAsText();
-        AnsiString GetAsHtml();
-        void Copy2Clipboard();
-        void CopyCell2Clipboard();
-        void InternalDelayedScroll();
-        void SetupColumns();
-        void PrisposobSirky(int zaciatok);
-        static void ViewInitPath(String path);
-        static void XMLInitPath(AnsiString path);
-        static void XMLClosePath();
-        void XMLInitName(AnsiString name);
-        void XMLSave(bool force=false);
-        TColumn* FindNamedColumn(AnsiString name);
-        AnsiString FindColumnName(TColumn *col);
+  __fastcall TRurDBGrid(TComponent* Owner);
+  __fastcall ~TRurDBGrid();
+  void CreateRColumns(TRurTable *tb,bool all=false);
+  void CreateRColumns(TDataSetCfg *_cfg,bool all=false);
+  void SaveSirky();
+  AnsiString GetAsText();
+  AnsiString GetAsHtml();
+  void Copy2Clipboard();
+  void CopyCell2Clipboard();
+  void InternalDelayedScroll();
+  void SetupColumns();
+  void PrisposobSirky(int zaciatok);
+  static void ViewInitPath(String path);
+  static void XMLInitPath(AnsiString path);
+  static void XMLClosePath();
+  void XMLInitName(AnsiString name);
+  void XMLSave(bool force=false);
+  TColumn* FindNamedColumn(AnsiString name);
+  AnsiString FindColumnName(TColumn *col);
 	void ReagujNaMenu(TMenuItem *menu);
   void DisableAutosave();
   String GetColOrder(TColumn *col, String def = EmptyStr);
   void ShowHelp(String id);
+  void SetMultivyberDizajn(bool e);
 
   friend class TRurDBGridConfigurator;
   friend class TRurDBGridColumnsDlg;
@@ -206,6 +208,7 @@ __published:
   __property TNotifyEvent OnExport  = { read=FOnExport, write=FOnExport };
   __property String ExtendedColumns = {read=FExtendedColumns, write=SetExtendedColumns};
   __property TRurDBGridHelpEvent OnHelp = {read=FOnHelp, write=FOnHelp};
+  __property bool EnableMultiselect = {read=FEnableMultiselect, write=FEnableMultiselect};
 };
 //---------------------------------------------------------------------------
 #endif

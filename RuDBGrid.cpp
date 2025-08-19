@@ -110,6 +110,7 @@ for(int i=0;i<4;i++)
   mih[i] = NULL;
 viewsItem = NULL;
 user_views_activity = 0;
+FEnableMultiselect = true;
 }
 
 ///
@@ -269,32 +270,7 @@ if(!robil_nieco) // hodim prvych 6 pouzitelnych
 ///
 AnsiString TRurDBGrid::GetAsText()
 {
-AnsiString tmp;
-for(int i=0;i<Columns->Count;i++)
-  {
-  if(Columns->Items[i]->Visible)
-    tmp+=Columns->Items[i]->Title->Caption+"\t";
-  }
-tmp+="\r\n";
-TDataSet *s=DataSource->DataSet;
-s->First();
-while(!s->Eof)
-  {
-  for(int i=0;i<Columns->Count;i++)
-    {
-    if(Columns->Items[i]->Visible==false) continue;
-    TField *f=Columns->Items[i]->Field;
-    if(f==NULL)
-      tmp+="\t";
-    else if(f->DataType==ftMemo)
-      tmp+=f->AsString+"\t";
-    else
-      tmp+=f->Text+"\t";
-    }
-  tmp+="\r\n";
-  s->Next();
-  }
-return tmp;
+return TRurDBGridMenu::DoGetAsText(this);
 }
 
 ///
@@ -302,89 +278,12 @@ return tmp;
 ///
 AnsiString TRurDBGrid::GetAsHtml()
 {
-AnsiString tmp;
-tmp+="<table>\r\n";
-tmp+="<tr>\r\n";
-for(int i=0;i<Columns->Count;i++)
-  {
-  if(Columns->Items[i]->Visible)
-    tmp+="<td>"+AnsiToUtf8(Columns->Items[i]->Title->Caption)+"</td>";
-  }
-tmp+="\r\n";
-tmp+="</tr>\r\n";
-
-TDataSet *s=DataSource->DataSet;
-s->First();
-while(!s->Eof)
-  {
-  tmp+="<tr>\r\n";
-  for(int i=0;i<Columns->Count;i++)
-    {
-    if(Columns->Items[i]->Visible==false) continue;
-    TField *f=Columns->Items[i]->Field;
-    if(f==NULL)
-      tmp+="<td></td>";
-    else if(f->DataType==ftMemo)
-      tmp+="<td>"+AnsiToUtf8(f->AsString)+"</td>";
-    else
-      tmp+="<td>"+AnsiToUtf8(f->Text)+"</td>";
-    }
-  tmp+="</tr>\r\n";
-  s->Next();
-  }
-tmp+="</table>\r\n";
-return tmp;
+return TRurDBGridMenu::DoGetAsHTML(this);
 }
 
 void TRurDBGrid::Copy2Clipboard()
 {
-UINT CF_HTML=RegisterClipboardFormatA("HTML Format");
-AnsiString tmp;
-TClipboard *c=Clipboard();
-c->Open();
-// text
-tmp=GetAsText();
-HGLOBAL gMem=GlobalAlloc(GMEM_DDESHARE + GMEM_MOVEABLE, tmp.Length()+1);
-void *g=GlobalLock(gMem);
-CopyMemory(g,tmp.c_str(),tmp.Length()+1);
-GlobalUnlock(gMem);
-c->SetAsHandle(CF_TEXT,(THandle)gMem);
-
-// html
-tmp="Version:0.9\r\n"
-  "StartHTML:<<<<<1\r\n"
-  "EndHTML:<<<<<2\r\n"
-  "StartFragment:^^^^^^\r\n"
-  "EndFragment:같같같\r\n"
-  "StartSelection:^^^^^^\r\n"
-  "EndSelection:같같같\r\n";
-AnsiString s;
-s.printf("%06d",tmp.Length());
-tmp=AnsiReplaceText(tmp,"<<<<<1",s);
-tmp+="<html>\r\n";
-tmp+="<head>\r\n";
-tmp+="<meta http-equiv=Content-Type content=\"text/html; charset=utf-8\">\r\n";
-tmp+="<meta name=Generator content=\"TRurDBGrid\">\r\n";
-tmp+="</head>\r\n";
-tmp+="<body>\r\n";
-tmp+="<!--StartFragment-->";
-AnsiString sf,ef;
-sf.printf("%06d",tmp.Length());
-tmp=AnsiReplaceText(tmp,"^^^^^^",sf);
-tmp+=GetAsHtml();
-ef.printf("%06d",tmp.Length());
-tmp=AnsiReplaceText(tmp,"같같같",ef);
-tmp+="<!--EndFragment-->\r\n";
-tmp+="</body>\r\n";
-tmp+="</html>";
-s.printf("%06d",tmp.Length());
-tmp=AnsiReplaceText(tmp,"<<<<<2",s);
-gMem=GlobalAlloc(GMEM_DDESHARE + GMEM_MOVEABLE, tmp.Length()+1);
-g=GlobalLock(gMem);
-CopyMemory(g,tmp.c_str(),tmp.Length()+1);
-GlobalUnlock(gMem);
-c->SetAsHandle(CF_HTML,(THandle)gMem);
-c->Close();
+TRurDBGridMenu::DoCopyTable(this);
 }
 
 ///
@@ -392,13 +291,7 @@ c->Close();
 ///
 void TRurDBGrid::CopyCell2Clipboard()
 {
-TDataSet *s = DataSource->DataSet;
-if(s) {
-  int idx = this->SelectedIndex;
-  String value = this->Columns->operator [](idx)->Field->AsString;
-  TClipboard *c = Clipboard();
-  c->AsText = value;
-  }
+TRurDBGridMenu::DoCopyBunka(this);
 }
 
 void __fastcall TRurDBGrid::SetRIniName(AnsiString value)
@@ -579,6 +472,29 @@ if(Now()>ds_time) // uz je viac, ako pozadovany cas
   }
 }
 
+///
+/// Nastavi multiberovy dizajn so zaskrtavacimi polami
+///
+void TRurDBGrid::SetMultivyberDizajn(bool e)
+{
+if(e==false) {
+  ExOptions = ExOptions>>eoCheckBoxSelect;
+  Options = Options>>dgMultiSelect;
+  if(hide_indicator) {
+    Options = Options>>dgIndicator;
+    hide_indicator = false;
+    }
+  }
+else {
+  ExOptions = ExOptions<<eoCheckBoxSelect;
+  Options = Options<<dgMultiSelect;
+  WidthOfIndicator = 24;
+  if(Options.Contains(dgIndicator)==false) {
+    Options = Options<<dgIndicator;
+    hide_indicator = true;
+    }
+  }
+}
 
 void __fastcall TRurDBGrid::KeyDown(Word &Key, Classes::TShiftState Shift)
 {
@@ -599,9 +515,13 @@ void __fastcall TRurDBGrid::KeyUp(Word &Key, Classes::TShiftState Shift)
 {
 Word K=::MapVirtualKey(Key,2);
 TSMDBGrid::KeyUp(Key,Shift);
-if(Shift.Contains(ssCtrl) && Key==77)  // Ctrl-M
+if(Shift.Contains(ssCtrl) && Key==77 && FEnableMultiselect)  // Ctrl-M
   {
   if(ExOptions.Contains(eoCheckBoxSelect))
+    SetMultivyberDizajn(false);
+  else
+    SetMultivyberDizajn(true);
+  /*if(ExOptions.Contains(eoCheckBoxSelect))
     {
     ExOptions=ExOptions>>eoCheckBoxSelect;
     Options=Options>>dgMultiSelect;
@@ -621,7 +541,7 @@ if(Shift.Contains(ssCtrl) && Key==77)  // Ctrl-M
       Options=Options<<dgIndicator;
       hide_indicator=true;
       }
-    }
+    }*/
   return;
   }
 if(DataSource && DataSource->DataSet && DataSource->DataSet->Active && FKeyLocateRecord /*&& dynamic_cast<TFDDataSet*>(DataSource->DataSet)*/)
@@ -1233,8 +1153,8 @@ if(TDirectory::Exists(view_path)) {
     json_name = name;
     //json_name = "test"; // iba ked testujes
     TBytes bt = TFile::ReadAllBytes(view);
-    rur::json::RObject jn;
-    jn.Parse(bt);
+    rur::json::RObject jn(new TJSONObject);
+    jn.ParseBytes(bt);
     String nm = jn.value("name");
     if(nm==name) {
       // stlpce

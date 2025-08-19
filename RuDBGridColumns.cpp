@@ -15,8 +15,9 @@
 #include <xmldoc.hpp>
 #include "xmltemplates.h"
 #include "CommonFunctions.h"
+#include <clipbrd.hpp>
+#include <strutils.hpp>
 
-//---------------------------------------------------------------------
 #pragma resource "*.dfm"
 TRurDBGridColumnsDlg *RurDBGridColumnsDlg;
 
@@ -407,8 +408,8 @@ rdgc.Init(table,c,user_id);
 ///
 /// Konstruktor
 ///
-TRurDBGridMenu::TRurDBGridMenu(Vcl::Dbgrids::TDBGrid *g)
-: grid(g)
+TRurDBGridMenu::TRurDBGridMenu(Vcl::Dbgrids::TDBGrid *g, int f)
+: grid(g), flag(f)
 {
 
 }
@@ -425,9 +426,166 @@ else
   menu->Items->Add(NewLine());
 
 TMenuItem *mi;
-mi = NewItem("Ståpce...", 0, false, true, OnSetup, 0, "gItem1");
-mi->Hint = "Upravenie ståpcov v tabu¾ke";
-menu->Items->Add(mi);
+if(flag&rdgmTABULKA) {
+  mi = NewItem("Kopíruj tabu¾ku do schránky", 0, false, true, OnTabulka, 0, "gItem1");
+  mi->Hint = "Skopírovanie celej tabu¾ky";
+  menu->Items->Add(mi);
+  }
+if(flag&rdgmBUNKA) {
+  mi = NewItem("Kopíruj bunku do schránky", 0, false, true, OnBunka, 0, "gItem2");
+  mi->Hint = "Skopírovanie oznaèenej bunky";
+  menu->Items->Add(mi);
+  }
+if(flag&rdgmSTLPCE) {
+  mi = NewItem("Ståpce...", 0, false, true, OnSetup, 0, "gItem3");
+  mi->Hint = "Upravenie ståpcov v tabu¾ke";
+  menu->Items->Add(mi);
+  }
+}
+
+AnsiString TRurDBGridMenu::DoGetAsText(Vcl::Dbgrids::TDBGrid *g)
+{
+AnsiString tmp;
+for(int i=0; i<g->Columns->Count; i++)
+  {
+  if(g->Columns->Items[i]->Visible)
+    tmp += g->Columns->Items[i]->Title->Caption+"\t";
+  }
+tmp+="\r\n";
+
+TDataSet *s = g->DataSource->DataSet;
+s->First();
+while(!s->Eof)
+  {
+  for(int i=0; i<g->Columns->Count; i++)
+    {
+    if(g->Columns->Items[i]->Visible==false) continue;
+    TField *f = g->Columns->Items[i]->Field;
+    if(f==NULL)
+      tmp += "\t";
+    else if(f->DataType==ftMemo)
+      tmp += f->AsString + "\t";
+    else
+      tmp += f->Text+"\t";
+    }
+  tmp+="\r\n";
+  s->Next();
+  }
+return tmp;
+}
+
+AnsiString TRurDBGridMenu::DoGetAsHTML(Vcl::Dbgrids::TDBGrid *g)
+{
+AnsiString tmp;
+tmp+="<table>\r\n";
+tmp+="<tr>\r\n";
+for(int i=0; i<g->Columns->Count; i++)
+  {
+  if(g->Columns->Items[i]->Visible)
+    tmp+="<td>"+AnsiToUtf8(g->Columns->Items[i]->Title->Caption)+"</td>";
+  }
+tmp+="\r\n";
+tmp+="</tr>\r\n";
+
+TDataSet *s = g->DataSource->DataSet;
+s->First();
+while(!s->Eof)
+  {
+  tmp+="<tr>\r\n";
+  for(int i=0;i<g->Columns->Count;i++)
+    {
+    if(g->Columns->Items[i]->Visible==false) continue;
+    TField *f=g->Columns->Items[i]->Field;
+    if(f==NULL)
+      tmp+="<td></td>";
+    else if(f->DataType==ftMemo)
+      tmp+="<td>"+AnsiToUtf8(f->AsString)+"</td>";
+    else
+      tmp+="<td>"+AnsiToUtf8(f->Text)+"</td>";
+    }
+  tmp+="</tr>\r\n";
+  s->Next();
+  }
+tmp+="</table>\r\n";
+return tmp;
+}
+
+void TRurDBGridMenu::DoCopyTable(Vcl::Dbgrids::TDBGrid *grid)
+{
+UINT CF_HTML = RegisterClipboardFormatA("HTML Format");
+AnsiString tmp;
+TClipboard *c = Clipboard();
+c->Open();
+// text
+tmp = DoGetAsText(grid);
+HGLOBAL gMem = GlobalAlloc(GMEM_DDESHARE + GMEM_MOVEABLE, tmp.Length()+1);
+void *g = GlobalLock(gMem);
+CopyMemory(g, tmp.c_str(), tmp.Length()+1);
+GlobalUnlock(gMem);
+c->SetAsHandle(CF_TEXT, (THandle)gMem);
+
+// html
+tmp = "Version:0.9\r\n"
+  "StartHTML:<<<<<1\r\n"
+  "EndHTML:<<<<<2\r\n"
+  "StartFragment:^^^^^^\r\n"
+  "EndFragment:°°°°°°\r\n"
+  "StartSelection:^^^^^^\r\n"
+  "EndSelection:°°°°°°\r\n";
+AnsiString s;
+s.printf("%06d",tmp.Length());
+tmp=AnsiReplaceText(tmp,"<<<<<1",s);
+tmp+="<html>\r\n";
+tmp+="<head>\r\n";
+tmp+="<meta http-equiv=Content-Type content=\"text/html; charset=utf-8\">\r\n";
+tmp+="<meta name=Generator content=\"TRurDBGrid\">\r\n";
+tmp+="</head>\r\n";
+tmp+="<body>\r\n";
+tmp+="<!--StartFragment-->";
+AnsiString sf,ef;
+sf.printf("%06d",tmp.Length());
+tmp=AnsiReplaceText(tmp,"^^^^^^",sf);
+tmp+=DoGetAsHTML(grid);
+ef.printf("%06d",tmp.Length());
+tmp=AnsiReplaceText(tmp,"°°°°°°",ef);
+tmp+="<!--EndFragment-->\r\n";
+tmp+="</body>\r\n";
+tmp+="</html>";
+s.printf("%06d",tmp.Length());
+tmp=AnsiReplaceText(tmp,"<<<<<2",s);
+gMem=GlobalAlloc(GMEM_DDESHARE + GMEM_MOVEABLE, tmp.Length()+1);
+g=GlobalLock(gMem);
+CopyMemory(g,tmp.c_str(),tmp.Length()+1);
+GlobalUnlock(gMem);
+c->SetAsHandle(CF_HTML,(THandle)gMem);
+c->Close();
+}
+
+///
+/// Tabulka do schranky
+///
+void __fastcall TRurDBGridMenu::OnTabulka(TObject *Sender)
+{
+DoCopyTable(grid);
+}
+
+///
+/// Bunka do schranky
+///
+void __fastcall TRurDBGridMenu::OnBunka(TObject *Sender)
+{
+DoCopyBunka(grid);
+}
+
+void TRurDBGridMenu::DoCopyBunka(Vcl::Dbgrids::TDBGrid *g)
+{
+TDataSet *s = g->DataSource->DataSet;
+if(s) {
+  int idx = g->SelectedIndex;
+  String value = g->Columns->operator [](idx)->Field->AsString;
+  TClipboard *c = Clipboard();
+  c->AsText = value;
+  }
 }
 
 ///

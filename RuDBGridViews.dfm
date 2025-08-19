@@ -4,7 +4,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   BorderStyle = bsDialog
   Caption = 'Poh'#318'ady'
   ClientHeight = 414
-  ClientWidth = 645
+  ClientWidth = 706
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -41,14 +41,14 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
     Caption = 'Zoznam u'#382#237'vate'#318'sk'#253'ch st'#314'pcov'
   end
   object lblPStlpce: TLabel
-    Left = 390
+    Left = 422
     Top = 8
     Width = 29
     Height = 13
     Caption = 'St'#314'pce'
   end
   object lblShowHelp: TLabel
-    Left = 562
+    Left = 626
     Top = 70
     Width = 57
     Height = 13
@@ -65,7 +65,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
     OnClick = lblShowHelpClick
   end
   object btnOk: TButton
-    Left = 562
+    Left = 626
     Top = 8
     Width = 75
     Height = 25
@@ -75,7 +75,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
     TabOrder = 6
   end
   object btnCancel: TButton
-    Left = 562
+    Left = 626
     Top = 39
     Width = 75
     Height = 25
@@ -96,7 +96,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   object lbStlpce: TListBox
     Left = 200
     Top = 27
-    Width = 153
+    Width = 186
     Height = 206
     ItemHeight = 13
     TabOrder = 1
@@ -105,22 +105,22 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   object lbUser: TListBox
     Left = 200
     Top = 275
-    Width = 153
+    Width = 186
     Height = 134
     ItemHeight = 13
     TabOrder = 3
     OnDblClick = aURightExecute
   end
   object lbPStlpce: TListBox
-    Left = 390
+    Left = 422
     Top = 27
-    Width = 153
+    Width = 186
     Height = 382
     ItemHeight = 13
     TabOrder = 5
   end
   object btnSRight: TButton
-    Left = 359
+    Left = 391
     Top = 27
     Width = 25
     Height = 25
@@ -128,7 +128,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
     TabOrder = 2
   end
   object btnURight: TButton
-    Left = 359
+    Left = 391
     Top = 275
     Width = 25
     Height = 25
@@ -160,7 +160,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
     TabOrder = 10
   end
   object btnMoveUp: TButton
-    Left = 562
+    Left = 626
     Top = 322
     Width = 75
     Height = 25
@@ -169,7 +169,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
     TabOrder = 11
   end
   object btnMoveDown: TButton
-    Left = 562
+    Left = 626
     Top = 353
     Width = 75
     Height = 25
@@ -177,7 +177,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
     TabOrder = 12
   end
   object btnDelete: TButton
-    Left = 562
+    Left = 626
     Top = 384
     Width = 75
     Height = 25
@@ -185,7 +185,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
     TabOrder = 13
   end
   object actlst1: TActionList
-    Left = 584
+    Left = 648
     Top = 96
     object aViewAdd: TAction
       Caption = 'Kop'#237'rova'#357' nov'#253' poh'#318'ad...'

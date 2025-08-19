@@ -68,17 +68,32 @@ void RurGridConfiguratorInit(AnsiString table,TFDConnection *c, int user_id);
 #endif
 extern TRurDBGridConfigurator rdgc;
 
+#define rdgmTABULKA 0x0001
+#define rdgmBUNKA   0x0002
+#define rdgmSTLPCE  0x0004
+
+///
+/// Menu pre obycajne gridy
+///
 class TRurDBGridMenu
 {
   Vcl::Dbgrids::TDBGrid *grid;
   TPopupMenu *menu;
+  int flag;
 
   void __fastcall OnSetup(TObject *Sender);
+  void __fastcall OnTabulka(TObject *Sender);
+  void __fastcall OnBunka(TObject *Sender);
 
 public:
-  TRurDBGridMenu(Vcl::Dbgrids::TDBGrid *g);
+  TRurDBGridMenu(Vcl::Dbgrids::TDBGrid *g, int f = rdgmTABULKA|rdgmBUNKA|rdgmSTLPCE);
 
   void CreateMenu();
+
+  static AnsiString DoGetAsText(Vcl::Dbgrids::TDBGrid *g);
+  static AnsiString DoGetAsHTML(Vcl::Dbgrids::TDBGrid *g);
+  static void DoCopyTable(Vcl::Dbgrids::TDBGrid *g);
+  static void DoCopyBunka(Vcl::Dbgrids::TDBGrid *g);
 };
 
 ///
