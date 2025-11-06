@@ -296,6 +296,7 @@ ColorNoc=TColor(0x0000AEAE);
 FTyp=pcplan1;
 FScale=pcps30;
 FTypDays=1;
+FHintMD = false;
 UpdateRange();
 //FPDobaZaciatok=8*2;
 //FPDobaKoniec=17*2;
@@ -2254,9 +2255,24 @@ p.y += VertScrollBar->Position;
 int sel = rca.FindXY2(p.x, p.y);
 RurCalendarItem *i = sel!=-1 ? &rca[sel] : NULL;
 if(i) {
-  String hnt = i->from.DateTimeString() + " - " + i->to.DateTimeString() + "\r\n" + i->text;
-  if(i->popis.Length())
-    hnt += "\r\n" + i->popis;
+  String hnt;
+  if(FHintMD) {
+    String s1 = i->from.DateString();
+    String s2 = i->to.DateString();
+    hnt = "MD:## " + i->text + "\r\n";
+    if(s1==s2)
+      hnt += "Termín: **" + s1 + " " + i->from.TimeString() + "-" + i->to.TimeString() + "**";
+    else
+      hnt += "Zaèiatok: **" + i->from.DateTimeString() + "**\r\n" +
+      "Koniec: **" + i->to.DateTimeString() + "**";
+    if(i->popis.Length())
+      hnt += "\r\n" + i->popis;
+  }
+  else {
+    hnt = i->from.DateTimeString() + " - " + i->to.DateTimeString() + "\r\n" + i->text;
+    if(i->popis.Length())
+      hnt += "\r\n" + i->popis;
+    }
   ph->HintStr = hnt;
   ph->HintMaxWidth = 300;
   ph->HintPos = ClientToScreen(TPoint(i->r.left, i->r.bottom - VertScrollBar->Position));
@@ -2300,6 +2316,7 @@ AnsiString tmp=ExtractFilePath(ParamStr(0))+"img\\pruzokh.bmp";
 if(FileExists(tmp))
   bpruzokh->LoadFromFile(tmp);
 VertScrollBar->Range=20*20;
+FHintMD = false;
 }
 
 ///
@@ -2596,9 +2613,24 @@ p.y += VertScrollBar->Position;
 TRurPlanCalendarHeaderItem *i = FindItem(p.x, p.y);
 if(i)
   {
-  String hnt = i->ri->from.DateTimeString() + " - " + i->ri->to.DateTimeString() + "\r\n" + i->ri->text;
-  if(i->ri->popis.Length())
-    hnt += "\r\n" + i->ri->popis;
+  String hnt;
+  if(FHintMD) {
+    String s1 = i->ri->from.DateString();
+    String s2 = i->ri->to.DateString();
+    hnt = "MD:## " + i->ri->text + "\r\n";
+    if(s1==s2)
+      hnt += "Termín: **" + s1 + "**";
+    else
+      hnt += "Zaèiatok: **" + i->ri->from.DateTimeString() + "**\r\n" +
+      "Koniec: **" + i->ri->to.DateTimeString() + "**";
+    if(i->ri->popis.Length())
+      hnt += "\r\n" + i->ri->popis;
+  }
+  else {
+    hnt = i->ri->from.DateTimeString() + " - " + i->ri->to.DateTimeString() + "\r\n" + i->ri->text;
+    if(i->ri->popis.Length())
+      hnt += "\r\n" + i->ri->popis;
+    }
   ph->HintStr = hnt;
   ph->HintMaxWidth = 300;
   ph->HintPos = ClientToScreen(TPoint(i->r.left, i->r.bottom - VertScrollBar->Position));

@@ -152,6 +152,7 @@ private:
   Word FCommand;
   TPopupMenu *FVlastneMenu;
   int dc_count;
+  bool FHintMD;
 
   MESSAGE void __fastcall WMPaint(Messages::TWMPaint &Message);
   void __fastcall SetColorNoc(TColor value);
@@ -250,6 +251,7 @@ public:
   TRurPlanCalendarUsers* __fastcall GetUsers() {return users;}
 
   __property Graphics::TCanvas* Canvas = {read=FCanvas};
+  __property bool HintMD = {read=FHintMD, write=FHintMD};
 
 __published:
   __property TColor ColorNoc  = { read=GetColorNoc, write=SetColorNoc };
@@ -301,6 +303,7 @@ private:
   TNotifyEvent FOnDblClick;
   TPlanEditEvent FOnEditTerm;
   TPlanEditEvent FOnSelTerm;
+  bool FHintMD;
 
   MESSAGE void __fastcall WMPaint(Messages::TWMPaint &Message);
   virtual void __fastcall Paint();
@@ -327,6 +330,7 @@ public:
   RurCalendarItem* GetSelItem();
 
   __property Graphics::TCanvas* Canvas = {read=FCanvas};
+  __property bool HintMD = {read=FHintMD, write=FHintMD};
 
 __published:
   __property Align;
