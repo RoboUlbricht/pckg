@@ -79,7 +79,7 @@ private:
   int FSort;
   Word FCommand;
   TPopupMenu *FVlastneMenu;
-  TMenuItem *mih[5];
+  TMenuItem *mih[7];
   TNotifyEvent FOnBeforeKeyLocate,FOnAfterKeyLocate;
   TNotifyEvent FOnDelayedScroll;
   TNotifyEvent FOnColumnsChanged;

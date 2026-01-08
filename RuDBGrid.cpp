@@ -106,7 +106,7 @@ names=NULL;
 namescount=0;
 hide_indicator=false;
 FOnExport=NULL;
-for(int i=0;i<4;i++)
+for(int i=0;i<6;i++)
   mih[i] = NULL;
 viewsItem = NULL;
 user_views_activity = 0;
@@ -655,6 +655,8 @@ else
     mih[2]->Visible = ExOptions.Contains(eoCheckBoxSelect);
     mih[3]->Visible = ExOptions.Contains(eoCheckBoxSelect) && FOnGroupCreate;
     mih[4]->Visible = ExOptions.Contains(eoCheckBoxSelect) && FOnGroupEdit;
+    mih[5]->Visible = ExOptions.Contains(eoCheckBoxSelect)==false;
+    mih[6]->Visible = ExOptions.Contains(eoCheckBoxSelect);
     return tmp;
     }
   mi=NewLine();
@@ -688,6 +690,16 @@ if(configcolumns)
   }
 
 // multiselekty
+mih[5]=NewItem("Povoli multivýber", 0, false, true, MMenuExecute, 0, "RGridItem8");
+mih[5]->Hint="Zapne multivýber v tabu¾ke";
+mih[5]->Tag=-12;
+tmp->Items->Add(mih[5]);
+
+mih[6]=NewItem("Zakáza multivýber", 0, false, true, MMenuExecute, 0, "RGridItem9");
+mih[6]->Hint="Vypne multivýber v tabu¾ke";
+mih[6]->Tag=-13;
+tmp->Items->Add(mih[6]);
+
 mih[0]=NewItem("Oznaèi všetko", 0, false, true, MMenuExecute, 0, "RGridItem3");
 mih[0]->Hint="Zaškrtne všetky riadky";
 mih[0]->Tag=-3;
@@ -718,6 +730,8 @@ mih[1]->Visible = ExOptions.Contains(eoCheckBoxSelect);
 mih[2]->Visible = ExOptions.Contains(eoCheckBoxSelect);
 mih[3]->Visible = ExOptions.Contains(eoCheckBoxSelect) && FOnGroupCreate;
 mih[4]->Visible = ExOptions.Contains(eoCheckBoxSelect) && FOnGroupEdit;
+mih[5]->Visible = ExOptions.Contains(eoCheckBoxSelect)==false;
+mih[6]->Visible = ExOptions.Contains(eoCheckBoxSelect);
 return tmp;
 }
 
@@ -837,6 +851,12 @@ switch(tag)
     break;
   case -11:
     SetupViews();
+    break;
+  case -12:
+    SetMultivyberDizajn(true);
+    break;
+  case -13:
+    SetMultivyberDizajn(false);
     break;
   case -90:
   case -91:
