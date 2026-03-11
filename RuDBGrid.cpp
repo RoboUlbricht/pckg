@@ -634,6 +634,20 @@ if(FKeyLocateRecord && DataSource && DataSource->DataSet && dynamic_cast<RUR_DB_
 }
 
 ///
+/// Nastavuje viditelnost poloziek menu
+///
+void TRurDBGrid::SetupMIH()
+{
+mih[mihAll]->Visible = ExOptions.Contains(eoCheckBoxSelect);
+mih[mihNothing]->Visible = ExOptions.Contains(eoCheckBoxSelect);
+mih[mihInvert]->Visible = ExOptions.Contains(eoCheckBoxSelect);
+mih[mihGroupCreate]->Visible = ExOptions.Contains(eoCheckBoxSelect) && FOnGroupCreate;
+mih[mihGroupSetup]->Visible = ExOptions.Contains(eoCheckBoxSelect) && FOnGroupEdit;
+mih[mihMultiEnable]->Visible = ExOptions.Contains(eoCheckBoxSelect)==false;
+mih[mihMultiDisable]->Visible = ExOptions.Contains(eoCheckBoxSelect);
+}
+
+///
 /// \brief Ziskanie popupmenu
 ///
 TPopupMenu* __fastcall TRurDBGrid::GetPopupMenu(void)
@@ -650,13 +664,7 @@ else
   {
   if(tmp->FindItem(FCommand,fkCommand))
     {
-    mih[0]->Visible = ExOptions.Contains(eoCheckBoxSelect);
-    mih[1]->Visible = ExOptions.Contains(eoCheckBoxSelect);
-    mih[2]->Visible = ExOptions.Contains(eoCheckBoxSelect);
-    mih[3]->Visible = ExOptions.Contains(eoCheckBoxSelect) && FOnGroupCreate;
-    mih[4]->Visible = ExOptions.Contains(eoCheckBoxSelect) && FOnGroupEdit;
-    mih[5]->Visible = ExOptions.Contains(eoCheckBoxSelect)==false;
-    mih[6]->Visible = ExOptions.Contains(eoCheckBoxSelect);
+    SetupMIH();
     return tmp;
     }
   mi=NewLine();
@@ -683,55 +691,54 @@ if(FOnExport)
 UpdateViewsMenu(tmp);
 if(configcolumns)
   {
-  mi=NewItem("Ståpce...", 0, false, true, MMenuExecute, 0, "RGridItem2");
-  mi->Hint="Upravenie ståpcov v tabu¾ke";
-  mi->Tag=-2;
-  tmp->Items->Add(mi);
+  mih[mihColumns] = NewItem("Ståpce...", 0, false, true, MMenuExecute, 0, "RGridItem2");
+  mih[mihColumns]->Hint = "Upravenie ståpcov v tabu¾ke";
+  mih[mihColumns]->Tag = -2;
+  tmp->Items->Add(mih[mihColumns]);
   }
 
+mih[mihColumnsOptimize]=NewItem("Optimalizuj šírku ståpcov", 0, false, true, MMenuExecute, 0, "RGridItem2");
+mih[mihColumnsOptimize]->Hint="Automatické upravenie šírok ståpcov v tabu¾ke na optimálnu ve¾kos";
+mih[mihColumnsOptimize]->Tag = -14;
+tmp->Items->Add(mih[mihColumnsOptimize]);
+
 // multiselekty
-mih[5]=NewItem("Povoli multivýber", 0, false, true, MMenuExecute, 0, "RGridItem8");
-mih[5]->Hint="Zapne multivýber v tabu¾ke";
-mih[5]->Tag=-12;
-tmp->Items->Add(mih[5]);
+mih[mihMultiEnable]=NewItem("Povoli multivýber", 0, false, true, MMenuExecute, 0, "RGridItem8");
+mih[mihMultiEnable]->Hint="Zapne multivýber v tabu¾ke";
+mih[mihMultiEnable]->Tag=-12;
+tmp->Items->Add(mih[mihMultiEnable]);
 
-mih[6]=NewItem("Zakáza multivýber", 0, false, true, MMenuExecute, 0, "RGridItem9");
-mih[6]->Hint="Vypne multivýber v tabu¾ke";
-mih[6]->Tag=-13;
-tmp->Items->Add(mih[6]);
+mih[mihMultiDisable]=NewItem("Zakáza multivýber", 0, false, true, MMenuExecute, 0, "RGridItem9");
+mih[mihMultiDisable]->Hint="Vypne multivýber v tabu¾ke";
+mih[mihMultiDisable]->Tag=-13;
+tmp->Items->Add(mih[mihMultiDisable]);
 
-mih[0]=NewItem("Oznaèi všetko", 0, false, true, MMenuExecute, 0, "RGridItem3");
-mih[0]->Hint="Zaškrtne všetky riadky";
-mih[0]->Tag=-3;
-tmp->Items->Add(mih[0]);
+mih[mihAll]=NewItem("Oznaèi všetko", 0, false, true, MMenuExecute, 0, "RGridItem3");
+mih[mihAll]->Hint="Zaškrtne všetky riadky";
+mih[mihAll]->Tag=-3;
+tmp->Items->Add(mih[mihAll]);
 
-mih[1]=NewItem("Oznaèi niè", 0, false, true, MMenuExecute, 0, "RGridItem4");
-mih[1]->Hint="Žiadne riadky nebudú zaškrtnuté";
-mih[1]->Tag=-4;
-tmp->Items->Add(mih[1]);
+mih[mihNothing]=NewItem("Oznaèi niè", 0, false, true, MMenuExecute, 0, "RGridItem4");
+mih[mihNothing]->Hint="Žiadne riadky nebudú zaškrtnuté";
+mih[mihNothing]->Tag=-4;
+tmp->Items->Add(mih[mihNothing]);
 
-mih[2]=NewItem("Invertova výber", 0, false, true, MMenuExecute, 0, "RGridItem5");
-mih[2]->Hint="Invertujú sa zaškrtnuté riadky";
-mih[2]->Tag=-6;
-tmp->Items->Add(mih[2]);
+mih[mihInvert]=NewItem("Invertova výber", 0, false, true, MMenuExecute, 0, "RGridItem5");
+mih[mihInvert]->Hint="Invertujú sa zaškrtnuté riadky";
+mih[mihInvert]->Tag=-6;
+tmp->Items->Add(mih[mihInvert]);
 
-mih[3]=NewItem("Vytvori skupinu...", 0, false, true, MMenuExecute, 0, "RGridItem6");
-mih[3]->Hint="Vytvorí sa skupina položiek a nastaví sa vo filtri";
-mih[3]->Tag=-7;
-tmp->Items->Add(mih[3]);
+mih[mihGroupCreate]=NewItem("Vytvori skupinu...", 0, false, true, MMenuExecute, 0, "RGridItem6");
+mih[mihGroupCreate]->Hint="Vytvorí sa skupina položiek a nastaví sa vo filtri";
+mih[mihGroupCreate]->Tag=-7;
+tmp->Items->Add(mih[mihGroupCreate]);
 
-mih[4]=NewItem("Spravova skupinu...", 0, false, true, MMenuExecute, 0, "RGridItem7");
-mih[4]->Hint="Upravovanie existujúcej skupiny";
-mih[4]->Tag=-8;
-tmp->Items->Add(mih[4]);
+mih[mihGroupSetup]=NewItem("Spravova skupinu...", 0, false, true, MMenuExecute, 0, "RGridItem7");
+mih[mihGroupSetup]->Hint="Upravovanie existujúcej skupiny";
+mih[mihGroupSetup]->Tag=-8;
+tmp->Items->Add(mih[mihGroupSetup]);
 
-mih[0]->Visible = ExOptions.Contains(eoCheckBoxSelect);
-mih[1]->Visible = ExOptions.Contains(eoCheckBoxSelect);
-mih[2]->Visible = ExOptions.Contains(eoCheckBoxSelect);
-mih[3]->Visible = ExOptions.Contains(eoCheckBoxSelect) && FOnGroupCreate;
-mih[4]->Visible = ExOptions.Contains(eoCheckBoxSelect) && FOnGroupEdit;
-mih[5]->Visible = ExOptions.Contains(eoCheckBoxSelect)==false;
-mih[6]->Visible = ExOptions.Contains(eoCheckBoxSelect);
+SetupMIH();
 return tmp;
 }
 
@@ -817,6 +824,58 @@ try {
 }
 
 ///
+/// Optimalizuje sirky stlpcov
+///
+void TRurDBGrid::OptimizeGridColumns(TDBGrid *Grid, int MaxColWidth)
+{
+// 1. Základné nastavenia
+TDataSet *ds = Grid->DataSource->DataSet;
+if (!ds || ds->IsEmpty()) return;
+
+ds->DisableControls(); // Vypneme prekres¾ovanie pre rýchlos
+TBookmark savePos = ds->GetBookmark(); // Uložíme si aktuálnu pozíciu
+
+try {
+  // Pre každý ståpec v mriežke
+  for (int i = 0; i < Grid->Columns->Count; i++) {
+    TColumn *col = Grid->Columns->Items[i];
+
+    // Šírka zaèína na šírke titulku (headeru)
+    int maxWidth = Grid->Canvas->TextWidth(col->Title->Caption) + 5;
+
+    // 2. Prejdeme záznamy (limit 100 pre výkon)
+    ds->First();
+    int rowCount = 0;
+    while (!ds->Eof && rowCount < 100) {
+      int cellWidth = 0;
+      if(col->Visible && col->Field)
+        cellWidth = Grid->Canvas->TextWidth(col->Field->DisplayText) + 5;
+      if (cellWidth > maxWidth) {
+        maxWidth = cellWidth;
+      }
+      ds->Next();
+      rowCount++;
+    }
+
+    // 3. Aplikujeme limity
+    if (maxWidth > MaxColWidth) {
+      col->Width = MaxColWidth;
+    } else {
+      col->Width = maxWidth;
+    }
+  }
+}
+__finally {
+  // 4. Upratovanie
+  if (ds->BookmarkValid(savePos)) {
+      ds->GotoBookmark(savePos);
+      ds->FreeBookmark(savePos);
+  }
+  ds->EnableControls();
+  }
+}
+
+///
 /// Pripoji svoju reakciu na menu polozku
 ///
 void TRurDBGrid::ReagujNaMenu(TMenuItem *menu)
@@ -857,6 +916,9 @@ switch(tag)
     break;
   case -13:
     SetMultivyberDizajn(false);
+    break;
+  case -14:
+    OptimizeGridColumns(this, 300);
     break;
   case -90:
   case -91:

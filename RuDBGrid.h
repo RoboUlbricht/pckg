@@ -65,6 +65,18 @@ String sort;
 TColumn *col;
 };
 
+enum MihIndex {
+  mihAll = 0,
+  mihNothing = 1,
+  mihInvert = 2,
+  mihGroupCreate = 3,
+  mihGroupSetup = 4,
+  mihMultiEnable = 5,
+  mihMultiDisable = 6,
+  mihColumns = 7,
+  mihColumnsOptimize = 8
+  };
+
 ///
 /// Grid
 ///
@@ -79,7 +91,7 @@ private:
   int FSort;
   Word FCommand;
   TPopupMenu *FVlastneMenu;
-  TMenuItem *mih[7];
+  TMenuItem *mih[9];
   TNotifyEvent FOnBeforeKeyLocate,FOnAfterKeyLocate;
   TNotifyEvent FOnDelayedScroll;
   TNotifyEvent FOnColumnsChanged;
@@ -137,6 +149,8 @@ private:
   TRurDBGridView* GetActiveView();
   TRurDBGridView* GetView(String name);
   void __fastcall SetExtendedColumns(String ex);
+  void SetupMIH();
+  void OptimizeGridColumns(TDBGrid *Grid, int MaxColWidth);
 
 protected:
   DYNAMIC void __fastcall TitleClick(TColumn* Column);
