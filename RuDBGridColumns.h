@@ -71,6 +71,7 @@ extern TRurDBGridConfigurator rdgc;
 #define rdgmTABULKA 0x0001
 #define rdgmBUNKA   0x0002
 #define rdgmSTLPCE  0x0004
+#define rdgmOPTIMUM 0x0008
 
 ///
 /// Menu pre obycajne gridy
@@ -84,6 +85,7 @@ class TRurDBGridMenu
   void __fastcall OnSetup(TObject *Sender);
   void __fastcall OnTabulka(TObject *Sender);
   void __fastcall OnBunka(TObject *Sender);
+  void __fastcall OnOptimum(TObject *Sender);
 
 public:
   TRurDBGridMenu(Vcl::Dbgrids::TDBGrid *g, int f = rdgmTABULKA|rdgmBUNKA);

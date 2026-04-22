@@ -150,7 +150,6 @@ private:
   TRurDBGridView* GetView(String name);
   void __fastcall SetExtendedColumns(String ex);
   void SetupMIH();
-  void OptimizeGridColumns(TDBGrid *Grid, int MaxColWidth);
 
 protected:
   DYNAMIC void __fastcall TitleClick(TColumn* Column);
@@ -195,6 +194,7 @@ public:
   String GetColOrder(TColumn *col, String def = EmptyStr);
   void ShowHelp(String id);
   void SetMultivyberDizajn(bool e);
+  static void OptimizeGridColumns(TDBGrid *Grid, int MaxColWidth);
 
   friend class TRurDBGridConfigurator;
   friend class TRurDBGridColumnsDlg;

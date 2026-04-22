@@ -441,6 +441,11 @@ if(flag&rdgmSTLPCE) {
   mi->Hint = "Upravenie ståpcov v tabu¾ke";
   menu->Items->Add(mi);
   }
+if(flag&rdgmOPTIMUM) {
+  mi = NewItem("Optimalizuj šírku ståpcov", 0, false, true, OnOptimum, 0, "gItem4");
+  mi->Hint = "Automatické upravenie šírok ståpcov v tabu¾ke na optimálnu ve¾kos";
+  menu->Items->Add(mi);
+  }
 }
 
 AnsiString TRurDBGridMenu::DoGetAsText(Vcl::Dbgrids::TDBGrid *g)
@@ -596,6 +601,14 @@ void __fastcall TRurDBGridMenu::OnSetup(TObject *Sender)
 rur::ptr<TRurDBGridColumnsDlg> col(new TRurDBGridColumnsDlg(grid));
 col->grid = grid;
 int vys = col->ShowModal();
+}
+
+///
+/// Optimalizuje sirky
+///
+void __fastcall TRurDBGridMenu::OnOptimum(TObject *Sender)
+{
+TRurDBGrid::OptimizeGridColumns(grid, 300);
 }
 
 ///
