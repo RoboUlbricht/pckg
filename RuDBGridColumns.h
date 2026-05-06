@@ -18,6 +18,7 @@
 #else
   #include <FireDAC.Comp.Client.hpp>
 #endif
+#include "ConfigItem.h"
 //----------------------------------------------------------------------------
 
 class XMLConfig;
@@ -94,6 +95,7 @@ public:
 
   static AnsiString DoGetAsText(Vcl::Dbgrids::TDBGrid *g);
   static AnsiString DoGetAsHTML(Vcl::Dbgrids::TDBGrid *g);
+  static TConfigItem DoGetAsConfig(Vcl::Dbgrids::TDBGrid *g);
   static void DoCopyTable(Vcl::Dbgrids::TDBGrid *g);
   static void DoCopyBunka(Vcl::Dbgrids::TDBGrid *g);
 };

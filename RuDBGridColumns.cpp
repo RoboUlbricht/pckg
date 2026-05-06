@@ -515,6 +515,49 @@ tmp+="</table>\r\n";
 return tmp;
 }
 
+TConfigItem TRurDBGridMenu::DoGetAsConfig(Vcl::Dbgrids::TDBGrid *g)
+{
+TConfigItem tmp;
+
+TConfigItem str;
+for(int i=0; i<g->Columns->Count; i++)
+  {
+  if(g->Columns->Items[i]->Visible) {
+    String c = g->Columns->Items[i]->Title->Caption;
+    TConfigItem f;
+    f["title"] = c;
+    f["fieldname"] = String("f") + i;
+    f["fieldtype"] = ftString;
+    f["size"] = 1024;
+    str.Add(f);
+    }
+  }
+tmp["struktura"] = str;
+
+TDataSet *s = g->DataSource->DataSet;
+s->First();
+while(!s->Eof)
+  {
+  TConfigItem d;
+  for(int i=0; i<g->Columns->Count; i++)
+    {
+    if(g->Columns->Items[i]->Visible==false) continue;
+    TField *f = g->Columns->Items[i]->Field;
+    String fn = String("f") + i;
+    if(f->IsNull)
+      d[fn].Value = Null();
+    else if(f->DataType==ftMemo)
+      d[fn] = f->AsString;
+    else
+      d[fn] = f->Text;
+    }
+  tmp["udaje"].Add(d);
+  s->Next();
+  }
+
+return tmp;
+}
+
 void TRurDBGridMenu::DoCopyTable(Vcl::Dbgrids::TDBGrid *grid)
 {
 UINT CF_HTML = RegisterClipboardFormatA("HTML Format");

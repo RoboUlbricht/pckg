@@ -281,6 +281,11 @@ AnsiString TRurDBGrid::GetAsHtml()
 return TRurDBGridMenu::DoGetAsHTML(this);
 }
 
+TConfigItem TRurDBGrid::GetAsConfig()
+{
+return TRurDBGridMenu::DoGetAsConfig(this);
+}
+
 void TRurDBGrid::Copy2Clipboard()
 {
 TRurDBGridMenu::DoCopyTable(this);

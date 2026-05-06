@@ -9,7 +9,8 @@
 #include <Forms.hpp>
 #include <smDBGrid.hpp>
 #include <Grids.hpp>
-#include<vector>
+#include <vector>
+#include "ConfigItem.h"
 
 class TRurTable;
 class TDataSetCfg;
@@ -177,6 +178,7 @@ public:
   void SaveSirky();
   AnsiString GetAsText();
   AnsiString GetAsHtml();
+  TConfigItem GetAsConfig();
   void Copy2Clipboard();
   void CopyCell2Clipboard();
   void InternalDelayedScroll();
