@@ -70,46 +70,48 @@ void TRurDBGridConfigurator::Close()
 ///
 bool TRurDBGridConfigurator::CreateColumns(TRurDBGrid *grid, AnsiString name, bool &saved)
 {
-saved=false;
+saved = false;
 if(xml==0) return false;
-if(xml->Locate("/columns/grid","id",name,"",true))
+if(xml->Locate("/columns/grid", "id", name, "", true))
   {
   grid->Columns->Clear();
-  int poc=xml->Count();
+  int poc = xml->Count();
   if(poc) // vytvorim zoznam pomenovanych stlpcov
     {
     if(grid->names) delete[] grid->names;
-    grid->names=new TRurDBGridColumnName[poc];
-    grid->namescount=poc;
+    grid->names = new TRurDBGridColumnName[poc];
+    grid->namescount = poc;
     }
 
-  int i=0;
+  int i = 0;
   while(poc)
     {
     xml->NextNode();
-    AnsiString scaption=xml->ReadLocatePropertyString("caption");
+    String scaption = xml->ReadLocatePropertyString("caption");
+    if(grid && grid->FOnColRename)
+      grid->FOnColRename(grid, scaption);
     if(TranslateGrid)
-      scaption=TranslateGrid(scaption);
-    AnsiString sfieldname=xml->ReadLocatePropertyString("fieldname");
-    AnsiString sname=xml->ReadLocatePropertyString("name");
+      scaption = TranslateGrid(scaption);
+    AnsiString sfieldname = xml->ReadLocatePropertyString("fieldname");
+    AnsiString sname = xml->ReadLocatePropertyString("name");
     if(sname.Length()==0) // nepomenovane pomenujem podla fieldu
       sname=sfieldname;
     AnsiString ssort = xml->ReadLocatePropertyString("sort");
-    AnsiString swidth=xml->ReadLocatePropertyString("width");
-    AnsiString svisible=xml->ReadLocatePropertyString("visible");
-    AnsiString smail=xml->ReadLocatePropertyString("mail");
-    AnsiString swww=xml->ReadLocatePropertyString("www");
+    AnsiString swidth = xml->ReadLocatePropertyString("width");
+    AnsiString svisible = xml->ReadLocatePropertyString("visible");
+    AnsiString smail = xml->ReadLocatePropertyString("mail");
+    AnsiString swww = xml->ReadLocatePropertyString("www");
 
-    TColumn *c=grid->Columns->Add();
-    c->Title->Caption=scaption;
-    c->FieldName=sfieldname;
-    c->Width=swidth.ToIntDef(64);
-    c->Visible=svisible=="1";
+    TColumn *c = grid->Columns->Add();
+    c->Title->Caption = scaption;
+    c->FieldName = sfieldname;
+    c->Width = swidth.ToIntDef(64);
+    c->Visible = svisible=="1";
     if(c->Visible && grid->FOnColEnable)
-      c->Visible=grid->FOnColEnable(grid,c->Title->Caption,c->FieldName);
+      c->Visible = grid->FOnColEnable(grid,c->Title->Caption,c->FieldName);
     if(smail=="1" || swww=="1") // maily farbim na modro
       {
-      c->Font->Color=clBlue;
+      c->Font->Color = clBlue;
       }
 
     // pomenovane stlpce
@@ -231,6 +233,8 @@ if(xml->Locate("/columns/grid", "id", name, "", true))
     {
     xml->NextNode();
     AnsiString scaption = xml->ReadLocatePropertyString("caption");
+    //if(grid && grid->FOnColRename)
+    //  grid->FOnColRename(grid, scaption);
     if(TranslateGrid)
       scaption = TranslateGrid(scaption);
     AnsiString sfieldname = xml->ReadLocatePropertyString("fieldname");

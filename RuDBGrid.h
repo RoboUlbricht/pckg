@@ -18,6 +18,7 @@ class TRurDBGrid;
 
 typedef void __fastcall (__closure *TRurDBGridWWWEvent)(AnsiString path);
 typedef bool __fastcall (__closure *TRurDBGridColEnabled)(TObject *Sender, AnsiString colname, AnsiString fieldname);
+typedef bool __fastcall (__closure *TRurDBGridColRename)(TObject *Sender, String &colname);
 typedef void __fastcall (__closure *TRurDBGridGroupEvent)(TObject *Sender);
 typedef int __fastcall (__closure *TRurDBGridSetupColumnsEvent)(TObject *Sender);
 typedef void __fastcall (__closure *TRurDBGridTitleClickSort)(TColumn *col);
@@ -102,6 +103,7 @@ private:
   TDBGridClickEvent  FOnCellCheckClick;
   TDBGridClickEvent  FOnCellClick2;
   TRurDBGridColEnabled FOnColEnable;
+  TRurDBGridColRename FOnColRename;
   TRurDBGridGroupEvent FOnGroupCreate;
   TRurDBGridGroupEvent FOnGroupEdit;
   TRurDBGridSetupColumnsEvent FOnSetupColumns;
@@ -218,6 +220,7 @@ __published:
   __property TDBGridClickEvent OnCellCheckClick = {read=FOnCellCheckClick, write=FOnCellCheckClick};
   __property TDBGridClickEvent OnCellClick2 = {read=FOnCellClick2, write=FOnCellClick2};
   __property TRurDBGridColEnabled OnColEnabled  = { read=FOnColEnable, write=FOnColEnable };
+  __property TRurDBGridColRename OnColRename  = { read=FOnColRename, write=FOnColRename };
   __property TRurDBGridGroupEvent OnGroupCreate  = { read=FOnGroupCreate, write=FOnGroupCreate };
   __property TRurDBGridGroupEvent OnGroupEdit  = { read=FOnGroupEdit, write=FOnGroupEdit };
   __property TRurDBGridSetupColumnsEvent OnSetupColumns  = { read=FOnSetupColumns, write=FOnSetupColumns };

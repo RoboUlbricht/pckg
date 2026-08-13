@@ -38,7 +38,11 @@ for(vViews::iterator i = user_views.begin(); i!=user_views.end(); i++) {
 
 // Zoznam stlpcov
 for(vColumns::iterator i = grid->def_columns.begin(); i!=grid->def_columns.end(); i++) {
-  lbStlpce->Items->Add(i->caption);
+  String s = i->caption;
+  if(grid && grid->FOnColRename && grid->FOnColRename(grid, s)) {
+    s = i->caption + " (" + s + ")";
+    }
+  lbStlpce->Items->Add(s);
 }
 // Zoznam uzivatelskych
 ucolumns = grid->ext_columns;
@@ -60,10 +64,15 @@ TRurDBGridView &v = user_views[pos];
 int is = 0;
 for(vColumns::iterator i = grid->def_columns.begin(); i!=grid->def_columns.end(); i++) {
   String predpona;
-  for(vColumns::iterator j=v.columns.begin(); j!=v.columns.end(); j++)
+  for(vColumns::iterator j=v.columns.begin(); j!=v.columns.end(); j++) {
     if(j->fieldname==i->fieldname)
       predpona = "* ";
-  lbStlpce->Items->Strings[is] = predpona + i->caption;
+    }
+  String s = i->caption;
+  if(grid && grid->FOnColRename && grid->FOnColRename(grid, s)) {
+    s = i->caption + " (" + s + ")";
+    }
+  lbStlpce->Items->Strings[is] = predpona + s;
   is++;
   }
 }
@@ -77,7 +86,11 @@ int pos = lbZoznam->ItemIndex;
 TRurDBGridView &v = user_views[pos];
 lbPStlpce->Items->Clear();
 for(vColumns::iterator i=v.columns.begin(); i!=v.columns.end(); i++) {
-  lbPStlpce->Items->Add(i->caption);
+  String s = i->caption;
+  if(grid && grid->FOnColRename && grid->FOnColRename(grid, s)) {
+    s = i->caption + " (" + s + ")";
+    }
+  lbPStlpce->Items->Add(s);
   }
 
 // Zoznam stlpcov

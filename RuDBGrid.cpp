@@ -77,21 +77,22 @@ for(vColumns::iterator i = columns.begin(); i!=columns.end(); i++) {
 __fastcall TRurDBGrid::TRurDBGrid(TComponent* Owner)
         : TSMDBGrid(Owner)
 {
-FTitleSort=true;
-FKeyLocateRecord=true;
-FSort=0;
-FCommand=-1;
-FVlastneMenu=NULL;
-FOnAfterKeyLocate=NULL;
-FOnBeforeKeyLocate=NULL;
-FOnDelayedScroll=NULL;
+FTitleSort = true;
+FKeyLocateRecord = true;
+FSort = 0;
+FCommand = -1;
+FVlastneMenu = NULL;
+FOnAfterKeyLocate = NULL;
+FOnBeforeKeyLocate = NULL;
+FOnDelayedScroll = NULL;
 FOnColumnsChanged = NULL;
 FOnTitleClickSort = NULL;
-FOnEmail=NULL;
-FOnWWW=NULL;
-FOnCellCheckClick=NULL;
-FOnCellClick2=NULL;
-FOnColEnable=NULL;
+FOnEmail = NULL;
+FOnWWW = NULL;
+FOnCellCheckClick = NULL;
+FOnCellClick2 = NULL;
+FOnColEnable = NULL;
+FOnColRename = NULL;
 FOnGroupCreate = NULL;
 FOnGroupEdit = NULL;
 FOnSetupColumns = NULL;
@@ -979,7 +980,10 @@ try {
   Columns->Clear();
   for(vColumns::iterator i=v->columns.begin(); i!=v->columns.end(); i++) {
     TColumn *c = Columns->Add();
-    c->Title->Caption = i->caption;
+    String cap = i->caption;
+    if(FOnColRename)
+      FOnColRename(this, cap);
+    c->Title->Caption = cap;
     c->FieldName = i->fieldname;
     c->Width = i->width;
     c->Visible = true;
