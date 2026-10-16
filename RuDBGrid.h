@@ -45,14 +45,17 @@ struct TRurDBGridView
 {
 String name;      ///< Nazov pohladu
 String shortcut;  ///< Klavesova skratka
-vColumns columns; ///< Zosnam stlpcov
+vColumns columns; ///< Zoznam stlpcov
 bool is_system;   ///< Je to systemovy pohlad
+bool is_public;   ///< Je verejny
+int owner;        ///< Vlastnik pohladu
 
 TRurDBGridView();
 TRurDBGridView(const TRurDBGridView &m);
 void operator=(const TRurDBGridView &m);
 
 void SetColumnWidth(String fieldname, int width);
+String GetName();
 };
 
 typedef std::vector<TRurDBGridView> vViews;
@@ -153,6 +156,8 @@ private:
   TRurDBGridView* GetView(String name);
   void __fastcall SetExtendedColumns(String ex);
   void SetupMIH();
+  String PrepareViewToSave(bool publ);
+  bool HasPublicViews();
 
 protected:
   DYNAMIC void __fastcall TitleClick(TColumn* Column);

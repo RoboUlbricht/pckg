@@ -10,6 +10,7 @@
 #pragma hdrstop
 
 #include "RuDBGridViews.h"
+#include "RuDBGridColumns.h"
 
 #pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -19,7 +20,7 @@ TRurDBGridViewsDlg *RurDBGridViewsDlg;
 /// Kostruktor
 ///
 __fastcall TRurDBGridViewsDlg::TRurDBGridViewsDlg(TComponent* Owner)
-  : TForm(Owner)
+  : TForm(Owner), has_public(false)
 {
 }
 
@@ -30,11 +31,19 @@ void __fastcall TRurDBGridViewsDlg::FormShow(TObject *Sender)
 {
 // Zoznam pohladov
 user_views = grid->user_views;
-for(vViews::iterator i = user_views.begin(); i!=user_views.end(); i++) {
-  int x = lbZoznam->Items->Add(i->name + (i->is_system ? " [sys]" : ""));
+for(int ii=0; ii<user_views.size(); ii++) {
+  vViews::iterator i = user_views.begin() + ii;
+  int x = lbZoznam->Items->AddObject(i->GetName(), (TObject*)ii);
   if(i->name==grid->last_view)
     lbZoznam->ItemIndex = x;
 }
+
+#if !defined(RUR_GRID_USE_DATASET)
+// Podporujeme verejne pohlady
+if(rdgc.HasPublic()) {
+  has_public = true;
+}
+#endif
 
 // Zoznam stlpcov
 for(vColumns::iterator i = grid->def_columns.begin(); i!=grid->def_columns.end(); i++) {
@@ -59,6 +68,7 @@ void TRurDBGridViewsDlg::OznacZoznamStlpcov()
 {
 int pos = lbZoznam->ItemIndex;
 if(pos==-1) return;
+pos = (int)lbZoznam->Items->Objects[pos];
 TRurDBGridView &v = user_views[pos];
 
 int is = 0;
@@ -83,6 +93,7 @@ for(vColumns::iterator i = grid->def_columns.begin(); i!=grid->def_columns.end()
 void __fastcall TRurDBGridViewsDlg::lbZoznamClick(TObject *Sender)
 {
 int pos = lbZoznam->ItemIndex;
+pos = (int)lbZoznam->Items->Objects[pos];
 TRurDBGridView &v = user_views[pos];
 lbPStlpce->Items->Clear();
 for(vColumns::iterator i=v.columns.begin(); i!=v.columns.end(); i++) {
@@ -105,16 +116,21 @@ void __fastcall TRurDBGridViewsDlg::aViewAddExecute(TObject *Sender)
 String newname;
 if(InputQuery("Názov pre poh¾ad", "Názov", newname) && newname.Length()) {
   int pos = lbZoznam->ItemIndex;
+  pos = (int)lbZoznam->Items->Objects[pos];
   TRurDBGridView &v = user_views[pos];
   TRurDBGridView nv = v;
   nv.name = newname;
   nv.is_system = false;
+  nv.is_public = false;
+  nv.owner = rdgc.GetUser(); // vlastnik je ten, co si ho kopiruje
   user_views.push_back(nv);
 
-  int x = lbZoznam->Items->Add(nv.name);
+  int x = lbZoznam->Items->AddObject(nv.GetName(), (TObject*)(user_views.size()-1));
   lbZoznam->ItemIndex = x;
   lbZoznamClick(NULL);
   }
+else
+  Application->MessageBox(L"Názov poh¾adu musí by nastavený.", L"Pomenovanie poh¾adu", MB_OK|MB_ICONEXCLAMATION);
 }
 
 ///
@@ -123,6 +139,7 @@ if(InputQuery("Názov pre poh¾ad", "Názov", newname) && newname.Length()) {
 void __fastcall TRurDBGridViewsDlg::aSRightExecute(TObject *Sender)
 {
 int pos = lbZoznam->ItemIndex;
+pos = (int)lbZoznam->Items->Objects[pos];
 int idx = lbStlpce->ItemIndex;
 if(pos==-1 || idx==-1)
   return;
@@ -153,6 +170,7 @@ void __fastcall TRurDBGridViewsDlg::aSRightUpdate(TObject *Sender)
 bool ena = false;
 if(lbStlpce->ItemIndex!=-1 && lbZoznam->ItemIndex!=-1) {
   int pos = lbZoznam->ItemIndex;
+  pos = (int)lbZoznam->Items->Objects[pos];
   TRurDBGridView &v = user_views[pos];
 
   if(v.is_system==false)
@@ -167,6 +185,7 @@ if(lbStlpce->ItemIndex!=-1 && lbZoznam->ItemIndex!=-1) {
 void __fastcall TRurDBGridViewsDlg::aURightExecute(TObject *Sender)
 {
 int pos = lbZoznam->ItemIndex;
+pos = (int)lbZoznam->Items->Objects[pos];
 int idx = lbUser->ItemIndex;
 if(pos==-1 || idx==-1)
   return;
@@ -196,6 +215,7 @@ void __fastcall TRurDBGridViewsDlg::aURightUpdate(TObject *Sender)
 bool ena = false;
 if(lbUser->ItemIndex!=-1 && lbZoznam->ItemIndex!=-1) {
   int pos = lbZoznam->ItemIndex;
+  pos = (int)lbZoznam->Items->Objects[pos];
   TRurDBGridView &v = user_views[pos];
 
   if(v.is_system==false)
@@ -211,6 +231,7 @@ void __fastcall TRurDBGridViewsDlg::aMoveUpExecute(TObject *Sender)
 {
 if(lbPStlpce->Items->Count>1 && lbPStlpce->ItemIndex>0) {
   int pos = lbZoznam->ItemIndex;
+  pos = (int)lbZoznam->Items->Objects[pos];
   TRurDBGridView &v = user_views[pos];
   TRurDBGridColumn c = v.columns[lbPStlpce->ItemIndex];
   v.columns[lbPStlpce->ItemIndex] = v.columns[lbPStlpce->ItemIndex-1];
@@ -228,6 +249,7 @@ void __fastcall TRurDBGridViewsDlg::aMoveUpUpdate(TObject *Sender)
 bool ena = false;
 if(lbZoznam->ItemIndex!=-1) {
   int pos = lbZoznam->ItemIndex;
+  pos = (int)lbZoznam->Items->Objects[pos];
   TRurDBGridView &v = user_views[pos];
   if(v.is_system==false && lbPStlpce->Items->Count>1 && lbPStlpce->ItemIndex>0)
     ena = true;
@@ -242,6 +264,7 @@ void __fastcall TRurDBGridViewsDlg::aMoveDownExecute(TObject *Sender)
 {
 if(lbPStlpce->Items->Count>1 && lbPStlpce->ItemIndex>-1 && lbPStlpce->ItemIndex<lbPStlpce->Items->Count-1) {
   int pos = lbZoznam->ItemIndex;
+  pos = (int)lbZoznam->Items->Objects[pos];
   TRurDBGridView &v = user_views[pos];
   TRurDBGridColumn c = v.columns[lbPStlpce->ItemIndex];
   v.columns[lbPStlpce->ItemIndex] = v.columns[lbPStlpce->ItemIndex+1];
@@ -259,6 +282,7 @@ void __fastcall TRurDBGridViewsDlg::aMoveDownUpdate(TObject *Sender)
 bool ena = false;
 if(lbZoznam->ItemIndex!=-1) {
   int pos = lbZoznam->ItemIndex;
+  pos = (int)lbZoznam->Items->Objects[pos];
   TRurDBGridView &v = user_views[pos];
   if(v.is_system==false && lbPStlpce->Items->Count>1 && lbPStlpce->ItemIndex>-1 && lbPStlpce->ItemIndex<lbPStlpce->Items->Count-1)
     ena = true;
@@ -272,12 +296,13 @@ if(lbZoznam->ItemIndex!=-1) {
 void __fastcall TRurDBGridViewsDlg::aViewRenameExecute(TObject *Sender)
 {
 int pos = lbZoznam->ItemIndex;
+pos = (int)lbZoznam->Items->Objects[pos];
 TRurDBGridView &v = user_views[pos];
 
 String newname = v.name;
 if(InputQuery("Nový názov pre poh¾ad", "Názov", newname) && newname.Length()) {
   v.name = newname;
-  lbZoznam->Items->Strings[pos] = newname;
+  lbZoznam->Items->Strings[lbZoznam->ItemIndex] = v.GetName();
   }
 }
 
@@ -289,9 +314,10 @@ void __fastcall TRurDBGridViewsDlg::aViewRenameUpdate(TObject *Sender)
 bool ena = false;
 if(lbZoznam->ItemIndex!=-1) {
   int pos = lbZoznam->ItemIndex;
+  pos = (int)lbZoznam->Items->Objects[pos];
   TRurDBGridView &v = user_views[pos];
 
-  if(v.is_system==false)
+  if(v.is_system==false && v.owner==rdgc.GetUser())
     ena = true;
   }
 ((TAction*)Sender)->Enabled = ena;
@@ -305,8 +331,11 @@ void __fastcall TRurDBGridViewsDlg::aViewDeleteExecute(TObject *Sender)
 if(Application->MessageBox(L"Môže sa oznaèená položka vymaza?", L"Vymazanie položky", MB_YESNO|MB_ICONQUESTION)==mrYes)
   {
   int pos = lbZoznam->ItemIndex;
+  pos = (int)lbZoznam->Items->Objects[pos];
   user_views.erase(user_views.begin() + pos);
   lbZoznam->Items->Delete(pos);
+  if(lbZoznam->Items->Count)
+    lbZoznam->ItemIndex = 0;
   }
 }
 
@@ -318,9 +347,10 @@ void __fastcall TRurDBGridViewsDlg::aViewDeleteUpdate(TObject *Sender)
 bool ena = false;
 if(lbZoznam->ItemIndex!=-1) {
   int pos = lbZoznam->ItemIndex;
+  pos = (int)lbZoznam->Items->Objects[pos];
   TRurDBGridView &v = user_views[pos];
 
-  if(v.is_system==false)
+  if(v.is_system==false && v.owner==rdgc.GetUser())
     ena = true;
   }
 ((TAction*)Sender)->Enabled = ena;
@@ -333,6 +363,7 @@ void __fastcall TRurDBGridViewsDlg::aDeleteExecute(TObject *Sender)
 {
 if(lbPStlpce->Items->Count>1) {
   int pos = lbZoznam->ItemIndex;
+  pos = (int)lbZoznam->Items->Objects[pos];
   TRurDBGridView &v = user_views[pos];
   v.columns.erase(v.columns.begin() + lbPStlpce->ItemIndex);
   lbPStlpce->Items->Delete(lbPStlpce->ItemIndex);
@@ -348,6 +379,7 @@ void __fastcall TRurDBGridViewsDlg::aDeleteUpdate(TObject *Sender)
 bool ena = false;
 if(lbZoznam->ItemIndex!=-1) {
   int pos = lbZoznam->ItemIndex;
+  pos = (int)lbZoznam->Items->Objects[pos];
   TRurDBGridView &v = user_views[pos];
 
   if(v.is_system==false && lbPStlpce->ItemIndex!=-1)
@@ -371,5 +403,67 @@ void __fastcall TRurDBGridViewsDlg::FormKeyDown(TObject *Sender, WORD &Key, TShi
 {
 if(Key==112)
   grid->ShowHelp(this->Name);
+}
+
+///
+/// Urob pohlad verejnym
+///
+void __fastcall TRurDBGridViewsDlg::aViewPublicExecute(TObject *Sender)
+{
+if(lbZoznam->ItemIndex!=-1) {
+  int pos = lbZoznam->ItemIndex;
+  pos = (int)lbZoznam->Items->Objects[pos];
+  TRurDBGridView &v = user_views[pos];
+  v.is_public = true;
+  lbZoznam->Items->Strings[lbZoznam->ItemIndex] = v.GetName();
+  }
+}
+
+///
+/// Enabluj verejny
+///
+void __fastcall TRurDBGridViewsDlg::aViewPublicUpdate(TObject *Sender)
+{
+bool ena = false;
+if(lbZoznam->ItemIndex!=-1) {
+  int pos = lbZoznam->ItemIndex;
+  pos = (int)lbZoznam->Items->Objects[pos];
+  TRurDBGridView &v = user_views[pos];
+
+  if(has_public && v.is_system==false && v.is_public==false && v.owner==rdgc.GetUser())
+    ena = true;
+  }
+((TAction*)Sender)->Enabled = ena;
+}
+
+///
+/// Urob pohlad sukromnym
+///
+void __fastcall TRurDBGridViewsDlg::aViewPrivateExecute(TObject *Sender)
+{
+if(lbZoznam->ItemIndex!=-1) {
+  int pos = lbZoznam->ItemIndex;
+  pos = (int)lbZoznam->Items->Objects[pos];
+  TRurDBGridView &v = user_views[pos];
+  v.is_public = false;
+  lbZoznam->Items->Strings[lbZoznam->ItemIndex] = v.GetName();
+  }
+}
+
+///
+/// Enabluj sukromny
+///
+void __fastcall TRurDBGridViewsDlg::aViewPrivateUpdate(TObject *Sender)
+{
+bool ena = false;
+if(lbZoznam->ItemIndex!=-1) {
+  int pos = lbZoznam->ItemIndex;
+  pos = (int)lbZoznam->Items->Objects[pos];
+  TRurDBGridView &v = user_views[pos];
+
+  if(has_public && v.is_system==false && v.is_public && v.owner==rdgc.GetUser())
+    ena = true;
+  }
+((TAction*)Sender)->Enabled = ena;
 }
 

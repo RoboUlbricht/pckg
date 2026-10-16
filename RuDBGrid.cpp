@@ -44,23 +44,29 @@ String TRurDBGrid::view_path;
 
 TRurDBGridView::TRurDBGridView()
 {
+owner = 0;
 is_system = false;
+is_public = false;
 }
 
 TRurDBGridView::TRurDBGridView(const TRurDBGridView &m)
 {
+owner = m.owner;
 name = m.name;
 shortcut = m.shortcut;
 columns = m.columns;
 is_system = m.is_system;
+is_public = m.is_public;
 }
 
 void TRurDBGridView::operator=(const TRurDBGridView &m)
 {
+owner = m.owner;
 name = m.name;
 shortcut = m.shortcut;
 columns = m.columns;
 is_system = m.is_system;
+is_public = m.is_public;
 }
 
 void TRurDBGridView::SetColumnWidth(String fieldname, int width)
@@ -69,6 +75,13 @@ for(vColumns::iterator i = columns.begin(); i!=columns.end(); i++) {
   if(i->fieldname==fieldname)
     i->width = width;
   }
+}
+
+String TRurDBGridView::GetName()
+{
+String ssys = (is_system ? " [systémový]" : "");
+String spublic = (is_public ? " [verejný]" : "");
+return name + ssys + spublic;
 }
 
 ///
@@ -767,7 +780,7 @@ if(user_views.size()) {
   int ii = 0;
   for(vViews::iterator i=user_views.begin(); i!=user_views.end(); i++) {
     TMenuItem *mi2;
-    mi2 = NewItem(i->name, 0, false, true, MMenuExecute, 0, String("view_") + ii);
+    mi2 = NewItem(i->GetName(), 0, false, true, MMenuExecute, 0, String("view_") + ii);
     mi2->GroupIndex = 101;
     mi2->RadioItem = true;
     mi2->AutoCheck = true;
@@ -829,55 +842,94 @@ try {
   }
 }
 
+// Pomocná štruktúra s predpripravenými ukazovate¾mi pre každý ståpec
+struct TColInfo {
+  TColumn *Column;
+  TField *Field;
+  int MaxWidth;
+  bool NeedMeasure;
+};
+
+
 ///
 /// Optimalizuje sirky stlpcov
 ///
-void TRurDBGrid::OptimizeGridColumns(TDBGrid *Grid, int MaxColWidth)
-{
-// 1. Základné nastavenia
-TDataSet *ds = Grid->DataSource->DataSet;
-if (!ds || ds->IsEmpty()) return;
+void TRurDBGrid::OptimizeGridColumns(TDBGrid *Grid, int MaxColWidth) {
+  // 1. Základné nastavenia a validácia
+  if (!Grid || !Grid->DataSource)
+    return;
 
-ds->DisableControls(); // Vypneme prekres¾ovanie pre rýchlos
-TBookmark savePos = ds->GetBookmark(); // Uložíme si aktuálnu pozíciu
+  TDataSet *ds = Grid->DataSource->DataSet;
+  if (!ds || ds->IsEmpty())
+    return;
 
-try {
-  // Pre každý ståpec v mriežke
-  for (int i = 0; i < Grid->Columns->Count; i++) {
-    TColumn *col = Grid->Columns->Items[i];
+  int colCount = Grid->Columns->Count;
+  if (colCount <= 0)
+    return;
 
-    // Šírka zaèína na šírke titulku (headeru)
-    int maxWidth = Grid->Canvas->TextWidth(col->Title->Caption) + 5;
+  ds->DisableControls();                 // Vypneme prekres¾ovanie pre rýchlos
+  TBookmark savePos = ds->GetBookmark(); // Uložíme si aktuálnu pozíciu
 
-    // 2. Prejdeme záznamy (limit 100 pre výkon)
+  try {
+    std::vector<TColInfo> cols(colCount);
+    int activeColumns = 0;
+
+    // Inicializácia: šírka zaèína na šírke titulku (headeru)
+    for (int i = 0; i < colCount; i++) {
+      TColumn *col = Grid->Columns->Items[i];
+      cols[i].Column = col;
+      cols[i].Field = col->Field;
+      cols[i].MaxWidth = Grid->Canvas->TextWidth(col->Title->Caption) + 5;
+      cols[i].NeedMeasure = (col->Visible && col->Field != NULL);
+
+      // Ak už hlavièka prekroèila limit, ståpec netreba ïalej mera
+      if (MaxColWidth > 0 && cols[i].MaxWidth >= MaxColWidth) {
+        cols[i].MaxWidth = MaxColWidth;
+        cols[i].NeedMeasure = false;
+      }
+
+      if (cols[i].NeedMeasure) {
+        activeColumns++;
+      }
+    }
+
+    // 2. Prejdeme záznamy v JEDINOM prechode (limit 100 pre výkon)
     ds->First();
     int rowCount = 0;
-    while (!ds->Eof && rowCount < 100) {
-      int cellWidth = 0;
-      if(col->Visible && col->Field)
-        cellWidth = Grid->Canvas->TextWidth(col->Field->DisplayText) + 5;
-      if (cellWidth > maxWidth) {
-        maxWidth = cellWidth;
+    while (!ds->Eof && rowCount < 100 && activeColumns > 0) {
+      for (int i = 0; i < colCount; i++) {
+        if (cols[i].NeedMeasure) {
+          int cellWidth = Grid->Canvas->TextWidth(cols[i].Field->DisplayText) + 5;
+          if (cellWidth > cols[i].MaxWidth) {
+            cols[i].MaxWidth = cellWidth;
+            // Ak ståpec dosiahol maximum, prestaneme ho mera
+            if (MaxColWidth > 0 && cols[i].MaxWidth >= MaxColWidth) {
+              cols[i].MaxWidth = MaxColWidth;
+              cols[i].NeedMeasure = false;
+              activeColumns--;
+            }
+          }
+        }
       }
       ds->Next();
       rowCount++;
     }
 
-    // 3. Aplikujeme limity
-    if (maxWidth > MaxColWidth) {
-      col->Width = MaxColWidth;
-    } else {
-      col->Width = maxWidth;
+    // 3. Aplikujeme vypoèítané šírky na ståpce
+    for (int i = 0; i < colCount; i++) {
+      if (cols[i].MaxWidth > MaxColWidth) {
+        cols[i].Column->Width = MaxColWidth;
+      } else {
+        cols[i].Column->Width = cols[i].MaxWidth;
+      }
     }
-  }
-}
-__finally {
-  // 4. Upratovanie
-  if (ds->BookmarkValid(savePos)) {
+  } __finally {
+    // 4. Upratovanie
+    if (ds->BookmarkValid(savePos)) {
       ds->GotoBookmark(savePos);
       ds->FreeBookmark(savePos);
-  }
-  ds->EnableControls();
+    }
+    ds->EnableControls();
   }
 }
 
@@ -1061,6 +1113,7 @@ if(vys==mrOk && FOnColumnsChanged)
 ///
 void TRurDBGrid::SetupViews()
 {
+bool has_public_before = this->HasPublicViews();
 rur::ptr<TRurDBGridViewsDlg> col(new TRurDBGridViewsDlg(this));
 col->grid = this;
 if(FOnHelp)
@@ -1068,6 +1121,10 @@ if(FOnHelp)
 int vys = col->ShowModal();
 if(vys==mrOk) {
   user_views = col->user_views;
+  bool has_public_after = this->HasPublicViews();
+  if(has_public_before && has_public_after==false)
+    rdgc.DeleteDataPublic(json_name);
+
   last_view = user_views[col->lbZoznam->ItemIndex].name;
   UpdateViewsMenu(NULL);
   LoadView(col->lbZoznam->ItemIndex);
@@ -1264,6 +1321,7 @@ if(TDirectory::Exists(view_path)) {
       for(unsigned i=0; i<views->Count; i++) {
         rur::json::RObject item(views.item(i), false);
         TRurDBGridView v;
+        v.owner = rdgc.GetUser();
         v.is_system = true;
         v.name = item.value("name");
         v.shortcut = item.value("shortcut");
@@ -1290,7 +1348,7 @@ if(TDirectory::Exists(view_path)) {
         rur::json::RObject item(views.item(i), false);
         String name = item.value("name");
         TRurDBGridView *old = GetView(name);
-        if(old && old->is_system) { // iba aktualizujem
+        if(old && old->is_system) { // iba aktualizujem sirky stlpcov systemoveho pohladu
           rur::json::RArray columns(item.array("columns"), false);
           for(unsigned j=0; j<columns->Count; j++) {
             rur::json::RObject item(columns.item(j), false);
@@ -1302,6 +1360,7 @@ if(TDirectory::Exists(view_path)) {
         else { // pridam ho
           TRurDBGridView v;
           v.is_system = false;
+          v.owner = rdgc.GetUser();
           v.name = name;
           rur::json::RArray columns(item.array("columns"), false);
           for(unsigned j=0; j<columns->Count; j++) {
@@ -1322,6 +1381,45 @@ if(TDirectory::Exists(view_path)) {
           user_views.push_back(v);
         }
       }
+
+      // spolocne pohlady
+      if(rdgc.HasPublic()) {
+        rur::ptr<TDataSet> userp = rdgc.LoadDataPublic(json_name);
+        if(userp->RecordCount) {
+          while(!userp->Eof) {
+            String s = userp->FieldByName("hodnota")->AsString;
+            rur::json::RObject j1((TJSONObject*)TJSONObject::ParseJSONValue(s));
+            rur::json::RArray views(j1.array("views"), false);
+            for(unsigned i=0; i<views->Count; i++) {
+              rur::json::RObject item(views.item(i), false);
+              String name = item.value("name");
+              TRurDBGridView v;
+              v.is_system = false;
+              v.is_public = true;
+              v.owner = userp->FieldByName("user_id")->AsInteger;
+              v.name = name;
+              rur::json::RArray columns(item.array("columns"), false);
+              for(unsigned j=0; j<columns->Count; j++) {
+                rur::json::RObject item(columns.item(j), false);
+                TRurDBGridColumn c;
+                c.fieldname = item.value("fieldname");
+                for(vColumns::iterator k=def_columns.begin(); k!=def_columns.end(); k++) {
+                  if(k->fieldname == c.fieldname)
+                    c.caption = k->caption;
+                  }
+                for(vColumns::iterator k=ext_columns.begin(); k!=ext_columns.end(); k++) {
+                  if(k->fieldname == c.fieldname)
+                    c.caption = k->caption;
+                  }
+                c.width = item.tvalue<int>("width");
+                v.columns.push_back(c);
+                }
+              user_views.push_back(v);
+              }
+            userp->Next();
+            }
+          }
+        }
     }
 
     LoadView(last_view);
@@ -1342,34 +1440,69 @@ if(rdgc.CreateColumns(this, name, loadedcolumns))
 }
 
 ///
+/// Vytvori zoznam pohladov na ulozenie
+/// - publ=false - sukromne
+/// - publ=true - verejne
+///
+String TRurDBGrid::PrepareViewToSave(bool publ)
+{
+rur::json::RObject jn(new TJSONObject());
+jn.set("last_view", last_view);
+jn.set("version", 1);
+rur::json::RArray jviews(new TJSONArray(), false);
+for(vViews::iterator i=user_views.begin(); i!=user_views.end(); i++) {
+  if(publ==false && i->is_public) // public nejde do normalneho zaznamu
+    continue;
+  if(publ==true && i->is_public && i->owner!=rdgc.GetUser()) // do public zoznamu moze ulozit iba svoje pohlady
+    continue;
+  if(publ==true && i->is_public==false) // do public nesmu ist privatne pohlady
+    continue;
+  rur::json::RObject v(new TJSONObject(), false);
+  v.set("name", i->name);
+  rur::json::RArray jcolumns(new TJSONArray(), false);
+  for(vColumns::iterator j=i->columns.begin(); j!=i->columns.end(); j++) {
+    rur::json::RObject c(new TJSONObject(), false);
+    c.set("fieldname", j->fieldname);
+    c.set("width", j->width);
+    jcolumns->AddElement(c.get());
+    }
+  v->AddPair("columns", jcolumns.get());
+  jviews->AddElement(v.get());
+  }
+jn->AddPair("views", jviews.get());
+String json = jn->ToJSON();
+return json;
+}
+
+///
+/// Zisti, ci ma public pohlady ktore aj vlastni
+///
+bool TRurDBGrid::HasPublicViews()
+{
+bool has = false;
+int usr = rdgc.GetUser();
+for(vViews::iterator i=user_views.begin(); i!=user_views.end(); i++) {
+  if(i->is_public && i->owner==usr)
+    has = true;
+  }
+return has;
+}
+
+///
 /// Ulozenie uzivatelskej konfiguracie
 ///
 void TRurDBGrid::XMLSave(bool force)
 {
 if(user_views.size()) {
-  rur::json::RObject jn(new TJSONObject());
-  jn.set("last_view", last_view);
-  jn.set("version", 1);
-  rur::json::RArray jviews(new TJSONArray(), false);
-  for(vViews::iterator i=user_views.begin(); i!=user_views.end(); i++) {
-    rur::json::RObject v(new TJSONObject(), false);
-    v.set("name", i->name);
-    rur::json::RArray jcolumns(new TJSONArray(), false);
-    for(vColumns::iterator j=i->columns.begin(); j!=i->columns.end(); j++) {
-      rur::json::RObject c(new TJSONObject(), false);
-      c.set("fieldname", j->fieldname);
-      c.set("width", j->width);
-      jcolumns->AddElement(c.get());
-      }
-    v->AddPair("columns", jcolumns.get());
-    jviews->AddElement(v.get());
-    }
-  jn->AddPair("views", jviews.get());
-  String json = jn->ToJSON();
+  String json = PrepareViewToSave(false);
   rdgc.SaveData(json_name, json);
+  if(rdgc.HasPublic() && HasPublicViews()) {
+    String jsonp = PrepareViewToSave(true);
+    rdgc.SaveDataPublic(json_name, jsonp);
+  }
 }
 if(xmlname.Length())
-  rdgc.SaveGrid(this,xmlname);
+  rdgc.SaveGrid(this, xmlname);
 }
 
 ///

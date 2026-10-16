@@ -41,8 +41,11 @@ XMLConfig *user;  ///< Uzivatelska konfiguracia
 TDataSet *save;  ///< Sem ukladam uzivatelske nastavenie pre kazdy jeho grid
 #else
 TFDQuery *save;  ///< Sem ukladam uzivatelske nastavenie pre kazdy jeho grid
+String save_table;
+TFDConnection *save_c;
 #endif
 int user_id;      ///< id uzivatela
+int has_public;
 
 public:
   TRurDBGridConfigurator();
@@ -55,17 +58,24 @@ public:
   void Init(AnsiString table, TDataSet *_save, int _user_id);
 #else
   void Init(AnsiString table,TFDConnection *c, int _user_id);
+  void InitPublic();
+  bool HasPublic() {return has_public;}
+  int GetUser() {return user_id;}
 #endif
   void SaveGrid(Vcl::Dbgrids::TDBGrid *grid, AnsiString name);
   void ResetGrid(AnsiString name);
   void SaveData(String name, String data);
+  void SaveDataPublic(String name, String data);
   String LoadData(String name);
+  TDataSet *LoadDataPublic(String name);
+  void DeleteDataPublic(String name);
 };
 
 #if defined(RUR_GRID_USE_DATASET)
 void RurGridConfiguratorInit(AnsiString table, TDataSet *save, int user_id);
 #else
 void RurGridConfiguratorInit(AnsiString table,TFDConnection *c, int user_id);
+void RurGridConfiguratorInitPublic();
 #endif
 extern TRurDBGridConfigurator rdgc;
 

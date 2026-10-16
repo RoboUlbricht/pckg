@@ -48,6 +48,10 @@ __published:	// IDE-managed Components
   TAction *aMoveDown;
   TAction *aDelete;
   TLabel *lblShowHelp;
+  TAction *aViewPublic;
+  TAction *aViewPrivate;
+  TButton *btnViewPrivate;
+  TButton *btnViewPublic;
   void __fastcall FormShow(TObject *Sender);
   void __fastcall lbZoznamClick(TObject *Sender);
   void __fastcall aViewAddExecute(TObject *Sender);
@@ -67,8 +71,13 @@ __published:	// IDE-managed Components
   void __fastcall aDeleteUpdate(TObject *Sender);
   void __fastcall lblShowHelpClick(TObject *Sender);
   void __fastcall FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
+  void __fastcall aViewPublicExecute(TObject *Sender);
+  void __fastcall aViewPublicUpdate(TObject *Sender);
+  void __fastcall aViewPrivateExecute(TObject *Sender);
+  void __fastcall aViewPrivateUpdate(TObject *Sender);
 private:	// User declarations
   vColumns ucolumns;
+  bool has_public;
 
   void OznacZoznamStlpcov();
 

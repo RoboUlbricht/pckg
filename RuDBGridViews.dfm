@@ -3,7 +3,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Poh'#318'ady'
-  ClientHeight = 414
+  ClientHeight = 485
   ClientWidth = 706
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -22,30 +22,54 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   object lblZoznam: TLabel
     Left = 8
     Top = 8
-    Width = 86
+    Width = 102
     Height = 13
     Caption = 'Zoznam poh'#318'adov'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
   end
   object lblStlpce: TLabel
     Left = 200
     Top = 8
-    Width = 120
+    Width = 144
     Height = 13
     Caption = 'Zoznam v'#353'etk'#253'ch st'#314'pcov'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
   end
   object Label1: TLabel
     Left = 200
     Top = 256
-    Width = 143
+    Width = 172
     Height = 13
     Caption = 'Zoznam u'#382#237'vate'#318'sk'#253'ch st'#314'pcov'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
   end
   object lblPStlpce: TLabel
     Left = 422
     Top = 8
-    Width = 29
+    Width = 35
     Height = 13
     Caption = 'St'#314'pce'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
   end
   object lblShowHelp: TLabel
     Left = 626
@@ -106,7 +130,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
     Left = 200
     Top = 275
     Width = 186
-    Height = 134
+    Height = 200
     ItemHeight = 13
     TabOrder = 3
     OnDblClick = aURightExecute
@@ -115,7 +139,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
     Left = 422
     Top = 27
     Width = 186
-    Height = 382
+    Height = 448
     ItemHeight = 13
     TabOrder = 5
   end
@@ -161,7 +185,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   end
   object btnMoveUp: TButton
     Left = 626
-    Top = 322
+    Top = 388
     Width = 75
     Height = 25
     Action = aMoveUp
@@ -170,7 +194,7 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   end
   object btnMoveDown: TButton
     Left = 626
-    Top = 353
+    Top = 419
     Width = 75
     Height = 25
     Action = aMoveDown
@@ -178,11 +202,27 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
   end
   object btnDelete: TButton
     Left = 626
-    Top = 384
+    Top = 450
     Width = 75
     Height = 25
     Action = aDelete
     TabOrder = 13
+  end
+  object btnViewPrivate: TButton
+    Left = 8
+    Top = 368
+    Width = 89
+    Height = 25
+    Action = aViewPrivate
+    TabOrder = 14
+  end
+  object btnViewPublic: TButton
+    Left = 103
+    Top = 368
+    Width = 91
+    Height = 25
+    Action = aViewPublic
+    TabOrder = 15
   end
   object actlst1: TActionList
     Left = 648
@@ -235,6 +275,18 @@ object RurDBGridViewsDlg: TRurDBGridViewsDlg
       Hint = 'Vymaza'#357' ozna'#269'en'#253' st'#314'pec'
       OnExecute = aDeleteExecute
       OnUpdate = aDeleteUpdate
+    end
+    object aViewPublic: TAction
+      Caption = 'Verejn'#253
+      Hint = 'Poh'#318'ad sa stane verejn'#253'm pre v'#353'etk'#253'ch'
+      OnExecute = aViewPublicExecute
+      OnUpdate = aViewPublicUpdate
+    end
+    object aViewPrivate: TAction
+      Caption = 'S'#250'kromn'#253
+      Hint = 'Poh'#318'ad sa stane s'#250'kromn'#253'm'
+      OnExecute = aViewPrivateExecute
+      OnUpdate = aViewPrivateUpdate
     end
   end
 end

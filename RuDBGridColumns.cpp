@@ -26,9 +26,11 @@ TRurDBGridColumnsDlg *RurDBGridColumnsDlg;
 ///
 TRurDBGridConfigurator::TRurDBGridConfigurator()
 {
-xml=NULL;
-user=NULL;
-save=NULL;
+user_id = 0;
+xml = NULL;
+user = NULL;
+save = NULL;
+has_public = false;
 }
 
 ///
@@ -304,27 +306,39 @@ return false;
 }
 
 ///
-/// Natavenie ukladania konfiguracie do databazy
+/// Nastavenie ukladania konfiguracie do databazy
 ///
 #if defined(RUR_GRID_USE_DATASET)
 void TRurDBGridConfigurator::Init(AnsiString table, TDataSet *_save, int _user_id)
 {
 if(save)
   return;
-save=_save;
+save =_save;
 save->Open();
-user_id=_user_id;
+user_id = _user_id;
 }
 
 #else
-void TRurDBGridConfigurator::Init(AnsiString table,TFDConnection *c, int _user_id)
+void TRurDBGridConfigurator::Init(AnsiString table, TFDConnection *c, int _user_id)
 {
 if(save) delete save;
-save=new TFDQuery(NULL);
-save->Connection=c;
-save->SQL->Text="select * from "+table+" where user_id="+_user_id;
+
+save_table = table;
+save_c = c;
+
+save = new TFDQuery(NULL);
+save->Connection = c;
+save->SQL->Text = "select * from "+table+" where user_id="+_user_id;
 save->OpenOrExecute();
-user_id=_user_id;
+user_id = _user_id;
+}
+
+///
+/// Aktivuje pouzivanie public pohladov
+///
+void TRurDBGridConfigurator::InitPublic()
+{
+has_public = true;
 }
 #endif
 
@@ -385,6 +399,23 @@ if(save && save->Active) {
   }
 }
 
+void TRurDBGridConfigurator::SaveDataPublic(String name, String data)
+{
+rur::ptr<TFDQuery> savep = new TFDQuery(NULL);
+savep->Connection = save_c;
+savep->SQL->Text = "select * from " + save_table + "_public where user_id=" + user_id;
+savep->OpenOrExecute();
+
+if(savep->Locate("nazov", name, TLocateOptions()))
+    savep->Edit();
+else
+  savep->Append();
+savep->FieldByName("nazov")->AsString = name;
+savep->FieldByName("user_id")->AsInteger = user_id;
+savep->FieldByName("hodnota")->AsString = data;
+savep->Post();
+}
+
 String TRurDBGridConfigurator::LoadData(String name)
 {
 if(save && save->Active) {
@@ -392,6 +423,23 @@ if(save && save->Active) {
     return save->FieldByName("hodnota")->AsString;
   }
 return "";
+}
+
+TDataSet* TRurDBGridConfigurator::LoadDataPublic(String name)
+{
+TFDQuery* savep = new TFDQuery(NULL);
+savep->Connection = save_c;
+savep->SQL->Text = "select * from " + save_table + "_public where nazov='" + name + "'";
+savep->OpenOrExecute();
+
+
+return savep;
+}
+
+void TRurDBGridConfigurator::DeleteDataPublic(String name)
+{
+String sql = "delete from " + save_table + "_public where nazov='" + name + "' and user_id=" + user_id;
+save_c->ExecSQL(sql);
 }
 
 ///
@@ -405,7 +453,12 @@ rdgc.Init(table, save, user_id);
 #else
 void RurGridConfiguratorInit(AnsiString table,TFDConnection *c, int user_id)
 {
-rdgc.Init(table,c,user_id);
+rdgc.Init(table, c, user_id);
+}
+
+void RurGridConfiguratorInitPublic()
+{
+rdgc.InitPublic();
 }
 #endif
 
@@ -463,6 +516,7 @@ for(int i=0; i<g->Columns->Count; i++)
 tmp+="\r\n";
 
 TDataSet *s = g->DataSource->DataSet;
+s->DisableControls();
 s->First();
 while(!s->Eof)
   {
@@ -480,6 +534,7 @@ while(!s->Eof)
   tmp+="\r\n";
   s->Next();
   }
+s->EnableControls();
 return tmp;
 }
 
@@ -497,6 +552,7 @@ tmp+="\r\n";
 tmp+="</tr>\r\n";
 
 TDataSet *s = g->DataSource->DataSet;
+s->DisableControls();
 s->First();
 while(!s->Eof)
   {
@@ -515,6 +571,7 @@ while(!s->Eof)
   tmp+="</tr>\r\n";
   s->Next();
   }
+s->EnableControls();
 tmp+="</table>\r\n";
 return tmp;
 }
@@ -539,6 +596,7 @@ for(int i=0; i<g->Columns->Count; i++)
 tmp["struktura"] = str;
 
 TDataSet *s = g->DataSource->DataSet;
+s->DisableControls();
 s->First();
 while(!s->Eof)
   {
@@ -558,7 +616,7 @@ while(!s->Eof)
   tmp["udaje"].Add(d);
   s->Next();
   }
-
+s->EnableControls();
 return tmp;
 }
 
